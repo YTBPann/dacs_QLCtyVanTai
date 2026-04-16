@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard - Quản lý vận tải</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            background: #1e293b;
+            color: white;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 32px auto;
+            padding: 0 16px;
+        }
+        .card {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+        }
+        .logout-form {
+            margin: 0;
+        }
+        .logout-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 10px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        ul {
+            line-height: 1.8;
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <div><b>Hệ thống quản lý vận tải</b></div>
+    <form class="logout-form" th:action="@{/logout}" method="post">
+        <button class="logout-btn" type="submit">Đăng xuất</button>
+    </form>
+</div>
+
+<div class="container">
+    <div class="card">
+        <h2>Dashboard</h2>
+        <p>Xin chào, <b th:text="${fullName}">User</b></p>
+        <p>Tên đăng nhập: <b th:text="${username}">username</b></p>
+        <p>Vai trò: <b th:text="${role}">ADMIN</b></p>
+
+        <hr>
+
+        <p>Khung nền auth đã hoạt động. Bước tiếp theo sẽ là:</p>
+        <ul>
+            <li>Quản lý tài khoản người dùng</li>
+            <li>Quản lý tài xế</li>
+            <li>Quản lý xe</li>
+            <li>Quản lý chuyến vận chuyển</li>
+            <li>Theo dõi GPS trên map</li>
+        </ul>
+    </div>
+</div>
+</body>
+</html>
