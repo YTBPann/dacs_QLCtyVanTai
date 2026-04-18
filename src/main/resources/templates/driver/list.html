@@ -7,10 +7,40 @@
 <body>
 <h1>Danh sách tài xế</h1>
 
-<p>Trang driver list đã hoạt động.</p>
+<div th:if="${successMessage != null}" style="color: green; margin-bottom: 12px;">
+    <span th:text="${successMessage}"></span>
+</div>
 
 <p>
-    <a th:href="@{/admin/drivers/create}">Đi tới form tạo tài xế</a>
+    <a th:href="@{/admin/drivers/create}">Tạo tài xế mới</a>
 </p>
+
+<table border="1" cellpadding="8" cellspacing="0">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Mã tài xế</th>
+        <th>Họ tên</th>
+        <th>SĐT</th>
+        <th>Số GPLX</th>
+        <th>Hạn GPLX</th>
+        <th>Trạng thái</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:if="${#lists.isEmpty(drivers)}">
+        <td colspan="7">Chưa có tài xế nào.</td>
+    </tr>
+    <tr th:each="driver : ${drivers}">
+        <td th:text="${driver.id}"></td>
+        <td th:text="${driver.driverCode}"></td>
+        <td th:text="${driver.fullName}"></td>
+        <td th:text="${driver.phoneNumber}"></td>
+        <td th:text="${driver.licenseNumber}"></td>
+        <td th:text="${driver.licenseExpiryDate}"></td>
+        <td th:text="${driver.active ? 'Đang hoạt động' : 'Ngừng hoạt động'}"></td>
+    </tr>
+    </tbody>
+</table>
 </body>
 </html>

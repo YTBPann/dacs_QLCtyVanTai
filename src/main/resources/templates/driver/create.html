@@ -7,7 +7,57 @@
 <body>
 <h1>Tạo tài xế</h1>
 
-<p>Trang create driver đã hoạt động.</p>
+<div th:if="${errorMessage != null}" style="color: red; margin-bottom: 12px;">
+    <span th:text="${errorMessage}"></span>
+</div>
+
+<form th:action="@{/admin/drivers/create}" th:object="${driverCreateRequest}" method="post">
+    <div style="margin-bottom: 10px;">
+        <label for="driverCode">Mã tài xế</label><br>
+        <input type="text" id="driverCode" th:field="*{driverCode}" placeholder="VD: TX001">
+    </div>
+
+    <div style="margin-bottom: 10px;">
+        <label for="fullName">Họ tên</label><br>
+        <input type="text" id="fullName" th:field="*{fullName}" placeholder="Nguyễn Văn A">
+    </div>
+
+    <div style="margin-bottom: 10px;">
+        <label for="phoneNumber">Số điện thoại</label><br>
+        <input type="text" id="phoneNumber" th:field="*{phoneNumber}" placeholder="0901234567">
+    </div>
+
+    <div style="margin-bottom: 10px;">
+        <label for="licenseNumber">Số GPLX</label><br>
+        <input type="text" id="licenseNumber" th:field="*{licenseNumber}" placeholder="GPLX-001">
+    </div>
+
+    <div style="margin-bottom: 10px;">
+        <label for="licenseExpiryDate">Ngày hết hạn GPLX</label><br>
+        <input type="date" id="licenseExpiryDate" th:field="*{licenseExpiryDate}">
+    </div>
+
+    <div style="margin-bottom: 10px;">
+        <label for="address">Địa chỉ</label><br>
+        <textarea id="address" th:field="*{address}" rows="3" cols="40"></textarea>
+    </div>
+
+    <div style="margin-bottom: 10px;">
+        <label for="notes">Ghi chú</label><br>
+        <textarea id="notes" th:field="*{notes}" rows="4" cols="40"></textarea>
+    </div>
+
+    <div style="margin-bottom: 14px;">
+        <label>
+            <input type="checkbox" th:field="*{active}">
+            Đang hoạt động
+        </label>
+    </div>
+
+    <div style="margin-bottom: 14px;">
+        <button type="submit">Lưu tài xế</button>
+    </div>
+</form>
 
 <p>
     <a th:href="@{/admin/drivers}">Quay lại danh sách tài xế</a>
