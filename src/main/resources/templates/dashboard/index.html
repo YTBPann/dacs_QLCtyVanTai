@@ -40,6 +40,18 @@
             border-radius: 8px;
             cursor: pointer;
         }
+        .actions {
+            margin: 20px 0;
+        }
+        .action-link {
+            display: inline-block;
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            padding: 10px 14px;
+            border-radius: 8px;
+            margin-right: 10px;
+        }
         ul {
             line-height: 1.8;
         }
@@ -59,6 +71,10 @@
         <p>Xin chào, <b th:text="${fullName}">User</b></p>
         <p>Tên đăng nhập: <b th:text="${username}">username</b></p>
         <p>Vai trò: <b th:text="${role}">ADMIN</b></p>
+
+        <div class="actions" th:if="${role != null and role.toString() == 'ADMIN'}">
+            <a class="action-link" th:href="@{/users}">Quản lý tài khoản người dùng</a>
+        </div>
 
         <hr>
 

@@ -1,6 +1,7 @@
 package com.ytbpann.quanlyvantai.user.service;
 
 import com.ytbpann.quanlyvantai.user.dto.UserCreateRequest;
+import com.ytbpann.quanlyvantai.user.entity.RoleName;
 import com.ytbpann.quanlyvantai.user.entity.UserAccount;
 import com.ytbpann.quanlyvantai.user.repository.UserAccountRepository;
 import org.springframework.data.domain.Sort;
@@ -46,6 +47,10 @@ public class UserManagementService {
     public void changeUserStatus(Long userId, boolean enabled) {
         UserAccount user = userAccountRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy user với id = " + userId));
+
+        if (!enabled && user.getRole() == RoleName.ADMIN) {
+            return;
+        }
 
         user.setEnabled(enabled);
         userAccountRepository.save(user);

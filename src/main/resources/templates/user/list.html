@@ -35,11 +35,19 @@
         <td th:text="${user.role}"></td>
         <td th:text="${user.enabled ? 'Đang hoạt động' : 'Đã tắt'}"></td>
         <td>
-            <form th:if="${user.enabled}" th:action="@{/users/{id}/disable(id=${user.id})}" method="post" style="display:inline;">
+            <span th:if="${user.role.name() == 'ADMIN'}">Không cho phép</span>
+
+            <form th:if="${user.role.name() != 'ADMIN' and user.enabled}"
+                  th:action="@{/users/{id}/disable(id=${user.id})}"
+                  method="post"
+                  style="display:inline;">
                 <button type="submit">Tắt</button>
             </form>
 
-            <form th:if="${!user.enabled}" th:action="@{/users/{id}/enable(id=${user.id})}" method="post" style="display:inline;">
+            <form th:if="${user.role.name() != 'ADMIN' and !user.enabled}"
+                  th:action="@{/users/{id}/enable(id=${user.id})}"
+                  method="post"
+                  style="display:inline;">
                 <button type="submit">Bật</button>
             </form>
         </td>
