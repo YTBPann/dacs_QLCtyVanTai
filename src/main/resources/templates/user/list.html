@@ -21,6 +21,7 @@
     <tr>
         <th>ID</th>
         <th>Username</th>
+        <th>Họ và tên</th>
         <th>Role</th>
         <th>Trạng thái</th>
         <th>Hành động</th>
@@ -30,6 +31,7 @@
     <tr th:each="user : ${users}">
         <td th:text="${user.id}"></td>
         <td th:text="${user.username}"></td>
+        <td th:text="${user.fullName}"></td>
         <td th:text="${user.role}"></td>
         <td th:text="${user.enabled ? 'Đang hoạt động' : 'Đã tắt'}"></td>
         <td>
