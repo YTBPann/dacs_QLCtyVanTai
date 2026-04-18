@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Tạo user</title>
+</head>
+<body>
+<h1>Tạo tài khoản mới</h1>
+
+<p>
+    <a th:href="@{/users}">Quay lại danh sách user</a>
+</p>
+
+<form th:action="@{/users/create}" th:object="${userCreateRequest}" method="post">
+    <div>
+        <label>Username:</label>
+        <input type="text" th:field="*{username}">
+        <div th:if="${#fields.hasErrors('username')}" th:errors="*{username}" style="color:red;"></div>
+    </div>
+
+    <br>
+
+    <div>
+        <label>Password:</label>
+        <input type="password" th:field="*{password}">
+        <div th:if="${#fields.hasErrors('password')}" th:errors="*{password}" style="color:red;"></div>
+    </div>
+
+    <br>
+
+    <div>
+        <label>Role:</label>
+        <select th:field="*{role}">
+            <option value="">-- Chọn role --</option>
+            <option th:each="role : ${roles}" th:value="${role}" th:text="${role}"></option>
+        </select>
+        <div th:if="${#fields.hasErrors('role')}" th:errors="*{role}" style="color:red;"></div>
+    </div>
+
+    <br>
+
+    <button type="submit">Tạo tài khoản</button>
+</form>
+</body>
+</html>
