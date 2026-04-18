@@ -27,6 +27,7 @@ public class UserManagementService {
 
     public void createUser(UserCreateRequest request) {
         String username = request.getUsername().trim();
+        String fullName = request.getFullName().trim();
 
         if (userAccountRepository.existsByUsername(username)) {
             throw new IllegalArgumentException("Username đã tồn tại");
@@ -35,6 +36,7 @@ public class UserManagementService {
         UserAccount user = new UserAccount();
         user.setUsername(username);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setFullName(fullName);
         user.setRole(request.getRole());
         user.setEnabled(true);
 
