@@ -3,6 +3,9 @@ package com.ytbpann.quanlyvantai.driver.service;
 import com.ytbpann.quanlyvantai.driver.dto.DriverCreateRequest;
 import com.ytbpann.quanlyvantai.driver.entity.DriverProfile;
 import com.ytbpann.quanlyvantai.driver.repository.DriverProfileRepository;
+import com.ytbpann.quanlyvantai.user.entity.RoleName;
+import com.ytbpann.quanlyvantai.user.entity.UserAccount;
+import com.ytbpann.quanlyvantai.user.repository.UserAccountRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,14 +15,25 @@ import java.util.List;
 public class DriverService {
 
     private final DriverProfileRepository driverProfileRepository;
+    private final UserAccountRepository userAccountRepository;
 
-    public DriverService(DriverProfileRepository driverProfileRepository) {
+    public DriverService(DriverProfileRepository driverProfileRepository,
+                         UserAccountRepository userAccountRepository) {
         this.driverProfileRepository = driverProfileRepository;
+        this.userAccountRepository = userAccountRepository;
     }
 
     @Transactional(readOnly = true)
     public List<DriverProfile> getAllDrivers() {
-        return driverProfileRepository.findAllByOrderByIdDesc();
+        return driverProfileRepository.findAllWithLinkedUserAccountOrderByIdDesc();
+    }
+
+    @Transactional(readOnly = true)
+    public List<UserAccount> getAvailableDriverAccounts() {
+        return userAccountRepository.findByRoleOrderByUsernameAsc(RoleName.DRIVER)
+                .stream()
+                .filter(userAccount -> !driverProfileRepository.existsByLinkedUserAccount_Id(userAccount.getId()))
+                .toList();
     }
 
     @Transactional
@@ -51,6 +65,20 @@ public class DriverService {
             throw new IllegalArgumentException("Số GPLX đã tồn tại.");
         }
 
+        UserAccount linkedUserAccount = null;
+        if (request.getLinkedUserAccountId() != null) {
+            linkedUserAccount = userAccountRepository.findById(request.getLinkedUserAccountId())
+                    .orElseThrow(() -> new IllegalArgumentException("Tài khoản DRIVER được chọn không tồn tại."));
+
+            if (linkedUserAccount.getRole() != RoleName.DRIVER) {
+                throw new IllegalArgumentException("Chỉ được liên kết với tài khoản có role DRIVER.");
+            }
+
+            if (driverProfileRepository.existsByLinkedUserAccount_Id(linkedUserAccount.getId())) {
+                throw new IllegalArgumentException("Tài khoản DRIVER này đã được gắn với hồ sơ tài xế khác.");
+            }
+        }
+
         DriverProfile driverProfile = new DriverProfile();
         driverProfile.setDriverCode(driverCode);
         driverProfile.setFullName(fullName);
@@ -60,6 +88,7 @@ public class DriverService {
         driverProfile.setAddress(address);
         driverProfile.setNotes(notes);
         driverProfile.setActive(request.isActive());
+        driverProfile.setLinkedUserAccount(linkedUserAccount);
 
         driverProfileRepository.save(driverProfile);
     }

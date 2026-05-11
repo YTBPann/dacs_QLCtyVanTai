@@ -1,0 +1,17 @@
+N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\auth\controller\AuthController.java
+N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\auth\service\CustomUserDetailsService.java
+N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\config\DataInitializer.java
+N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\config\SecurityConfig.java
+N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\dashboard\controller\DashboardController.java
+N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\driver\controller\DriverController.java
+N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\driver\dto\DriverCreateRequest.java
+N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\driver\entity\DriverProfile.java
+N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\driver\repository\DriverProfileRepository.java
+N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\driver\service\DriverService.java
+N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\QuanlyvantaiApplication.java
+N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\user\controller\UserManagementController.java
+N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\user\dto\UserCreateRequest.java
+N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\user\entity\RoleName.java
+N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\user\entity\UserAccount.java
+N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\user\repository\UserAccountRepository.java
+N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\user\service\UserManagementService.java

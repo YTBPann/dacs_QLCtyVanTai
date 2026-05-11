@@ -1,5 +1,7 @@
 package com.ytbpann.quanlyvantai.driver.dto;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalDate;
 
 public class DriverCreateRequest {
@@ -8,7 +10,10 @@ public class DriverCreateRequest {
     private String fullName;
     private String phoneNumber;
     private String licenseNumber;
+
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate licenseExpiryDate;
+
     private String address;
     private String notes;
     private boolean active = true;
