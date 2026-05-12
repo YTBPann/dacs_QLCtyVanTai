@@ -3,6 +3,7 @@ package com.ytbpann.quanlyvantai.user.service;
 import com.ytbpann.quanlyvantai.driver.entity.DriverProfile;
 import com.ytbpann.quanlyvantai.driver.repository.DriverProfileRepository;
 import com.ytbpann.quanlyvantai.user.dto.UserCreateRequest;
+import com.ytbpann.quanlyvantai.user.dto.UserUpdateRequest;
 import com.ytbpann.quanlyvantai.user.entity.RoleName;
 import com.ytbpann.quanlyvantai.user.entity.UserAccount;
 import com.ytbpann.quanlyvantai.user.repository.UserAccountRepository;
@@ -10,7 +11,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.ytbpann.quanlyvantai.user.dto.UserUpdateRequest;
 
 import java.util.List;
 
@@ -29,6 +29,7 @@ public class UserManagementService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    @Transactional(readOnly = true)
     public List<UserAccount> findAllUsers() {
         return userAccountRepository.findAll(Sort.by(Sort.Direction.ASC, "id"));
     }
@@ -109,6 +110,12 @@ public class UserManagementService {
     }
 
     @Transactional(readOnly = true)
+    public UserAccount getUserById(Long id) {
+        return userAccountRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy user với ID: " + id));
+    }
+
+    @Transactional(readOnly = true)
     public UserUpdateRequest getUpdateRequest(Long userId) {
         UserAccount user = userAccountRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy user với id = " + userId));
@@ -162,14 +169,15 @@ public class UserManagementService {
             throw new IllegalArgumentException("Không được reset mật khẩu tài khoản ADMIN ở phase này");
         }
 
+        if (newPassword == null || newPassword.isBlank()) {
+            throw new IllegalArgumentException("Mật khẩu mới không được để trống");
+        }
+
         user.setPassword(passwordEncoder.encode(newPassword));
         userAccountRepository.save(user);
     }
 
-    private String safeTrim(String value) {
-        return value == null ? null : value.trim();
-    }
-
+    @Transactional
     public void changeUserStatus(Long userId, boolean enabled) {
         UserAccount user = userAccountRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy user với id = " + userId));
@@ -180,5 +188,9 @@ public class UserManagementService {
 
         user.setEnabled(enabled);
         userAccountRepository.save(user);
+    }
+
+    private String safeTrim(String value) {
+        return value == null ? null : value.trim();
     }
 }

@@ -107,12 +107,6 @@ public class UserManagementController {
         }
     }
 
-    @Transactional(readOnly = true)
-    public UserAccount getUserById(Long id) {
-        return userAccountRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy user với ID: " + id));
-    }
-
     @PostMapping("/{id}/edit")
     public String updateUser(@PathVariable Long id,
                              @Valid @ModelAttribute("userUpdateRequest") UserUpdateRequest request,
