@@ -53,6 +53,22 @@
         </td>
         <td>
             <a th:href="@{/admin/drivers/{id}/edit(id=${driver.id})}">Sửa</a>
+
+            <span th:if="${driver.linkedUserAccount != null}">
+                <form th:if="${driver.linkedUserAccount.enabled}"
+                      th:action="@{/admin/drivers/{id}/disable-account(id=${driver.id})}"
+                      method="post"
+                      style="display: inline; margin-left: 8px;">
+                    <button type="submit">Tắt tài khoản</button>
+                </form>
+
+                <form th:if="${!driver.linkedUserAccount.enabled}"
+                      th:action="@{/admin/drivers/{id}/enable-account(id=${driver.id})}"
+                      method="post"
+                      style="display: inline; margin-left: 8px;">
+                    <button type="submit">Bật tài khoản</button>
+                </form>
+            </span>
         </td>
     </tr>
     </tbody>

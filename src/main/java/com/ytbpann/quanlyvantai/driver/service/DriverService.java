@@ -187,6 +187,32 @@ public class DriverService {
         return driverProfile.isActive();
     }
 
+    @Transactional
+    public void changeLinkedUserStatus(Long driverId, boolean enabled) {
+        DriverProfile driverProfile = driverProfileRepository.findByIdWithLinkedUserAccount(driverId)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy hồ sơ tài xế."));
+
+        UserAccount linkedUser = driverProfile.getLinkedUserAccount();
+        if (linkedUser == null) {
+            throw new IllegalArgumentException("Tài xế này chưa liên kết tài khoản đăng nhập.");
+        }
+
+        if (linkedUser.getRole() != RoleName.DRIVER) {
+            throw new IllegalArgumentException("Tài khoản liên kết không phải role DRIVER.");
+        }
+
+        linkedUser.setEnabled(enabled);
+        userAccountRepository.save(linkedUser);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean hasLinkedUserAccount(Long driverId) {
+        DriverProfile driverProfile = driverProfileRepository.findByIdWithLinkedUserAccount(driverId)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy hồ sơ tài xế."));
+
+        return driverProfile.getLinkedUserAccount() != null;
+    }                                                                                                                                                                   
+
     private String safeTrim(String value) {
         return value == null ? null : value.trim();
     }

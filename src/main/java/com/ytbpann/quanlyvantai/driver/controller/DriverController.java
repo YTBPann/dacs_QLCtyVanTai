@@ -87,6 +87,32 @@ public class DriverController {
         }
     }
 
+    @PostMapping("/{id}/enable-account")
+    public String enableLinkedAccount(@PathVariable Long id,
+                                    RedirectAttributes redirectAttributes) {
+        try {
+            driverService.changeLinkedUserStatus(id, true);
+            redirectAttributes.addFlashAttribute("successMessage", "Đã bật tài khoản đăng nhập của tài xế.");
+        } catch (IllegalArgumentException ex) {
+            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+        }
+
+        return "redirect:/admin/drivers";
+    }
+
+    @PostMapping("/{id}/disable-account")
+    public String disableLinkedAccount(@PathVariable Long id,
+                                    RedirectAttributes redirectAttributes) {
+        try {
+            driverService.changeLinkedUserStatus(id, false);
+            redirectAttributes.addFlashAttribute("successMessage", "Đã tắt tài khoản đăng nhập của tài xế.");
+        } catch (IllegalArgumentException ex) {
+            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+        }
+
+        return "redirect:/admin/drivers";
+    }                                                               
+
     private void populateEditFormModel(Model model, Long driverId) {
         model.addAttribute("pageTitle", "Cập nhật tài xế");
         model.addAttribute("driverId", driverId);
