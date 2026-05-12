@@ -18,11 +18,6 @@ import java.util.List;
 @Transactional
 public class TripService {
 
-    private static final List<TripStatus> ACTIVE_TRIP_STATUSES = List.of(
-            TripStatus.PLANNED,
-            TripStatus.IN_PROGRESS
-    );
-
     private final TripRepository tripRepository;
     private final UserAccountRepository userAccountRepository;
     private final VehicleRepository vehicleRepository;
@@ -39,7 +34,7 @@ public class TripService {
 
     @Transactional(readOnly = true)
     public List<Trip> findAllTrips() {
-        return tripRepository.findAllByOrderByPlannedStartTimeDesc();
+        return tripRepository.findAllByOrderByIdAsc();
     }
 
     @Transactional(readOnly = true)
@@ -50,34 +45,22 @@ public class TripService {
 
     @Transactional(readOnly = true)
     public List<UserAccount> findAvailableDriversForCreate() {
-        return userAccountRepository.findByRoleAndEnabledTrueOrderByFullNameAsc(RoleName.DRIVER)
-                .stream()
-                .filter(driver -> !tripRepository.existsByDriverAndStatusIn(driver, ACTIVE_TRIP_STATUSES))
-                .toList();
+        return userAccountRepository.findByRoleAndEnabledTrueOrderByFullNameAsc(RoleName.DRIVER);
     }
 
     @Transactional(readOnly = true)
     public List<Vehicle> findAvailableVehiclesForCreate() {
-        return vehicleRepository.findByActiveTrueOrderByLicensePlateAsc()
-                .stream()
-                .filter(vehicle -> !tripRepository.existsByVehicleAndStatusIn(vehicle, ACTIVE_TRIP_STATUSES))
-                .toList();
+        return vehicleRepository.findByActiveTrueOrderByLicensePlateAsc();
     }
 
     @Transactional(readOnly = true)
     public List<UserAccount> findAvailableDriversForEdit(Long tripId) {
-        return userAccountRepository.findByRoleAndEnabledTrueOrderByFullNameAsc(RoleName.DRIVER)
-                .stream()
-                .filter(driver -> !tripRepository.existsByDriverAndStatusInAndIdNot(driver, ACTIVE_TRIP_STATUSES, tripId))
-                .toList();
+        return userAccountRepository.findByRoleAndEnabledTrueOrderByFullNameAsc(RoleName.DRIVER);
     }
 
     @Transactional(readOnly = true)
     public List<Vehicle> findAvailableVehiclesForEdit(Long tripId) {
-        return vehicleRepository.findByActiveTrueOrderByLicensePlateAsc()
-                .stream()
-                .filter(vehicle -> !tripRepository.existsByVehicleAndStatusInAndIdNot(vehicle, ACTIVE_TRIP_STATUSES, tripId))
-                .toList();
+        return vehicleRepository.findByActiveTrueOrderByLicensePlateAsc();
     }
 
     public Trip createTrip(TripForm form) {
@@ -88,11 +71,6 @@ public class TripService {
         Vehicle vehicle = findActiveVehicle(form.getVehicleId());
 
         TripStatus status = form.getStatus() == null ? TripStatus.PLANNED : form.getStatus();
-
-        if (isActiveTripStatus(status)) {
-            validateDriverNotInAnotherActiveTripForCreate(driver);
-            validateVehicleNotInAnotherActiveTripForCreate(vehicle);
-        }
 
         Trip trip = new Trip();
         applyFormToTrip(trip, form, driver, vehicle, status);
@@ -111,11 +89,6 @@ public class TripService {
 
         TripStatus status = form.getStatus() == null ? TripStatus.PLANNED : form.getStatus();
 
-        if (isActiveTripStatus(status)) {
-            validateDriverNotInAnotherActiveTripForUpdate(driver, id);
-            validateVehicleNotInAnotherActiveTripForUpdate(vehicle, id);
-        }
-
         applyFormToTrip(trip, form, driver, vehicle, status);
 
         return tripRepository.save(trip);
@@ -126,11 +99,6 @@ public class TripService {
 
         if (status == null) {
             throw new IllegalArgumentException("Trạng thái chuyến không hợp lệ");
-        }
-
-        if (isActiveTripStatus(status)) {
-            validateDriverNotInAnotherActiveTripForUpdate(trip.getDriver(), id);
-            validateVehicleNotInAnotherActiveTripForUpdate(trip.getVehicle(), id);
         }
 
         trip.setStatus(status);
@@ -221,34 +189,6 @@ public class TripService {
         if (!form.getPlannedEndTime().isAfter(form.getPlannedStartTime())) {
             throw new IllegalArgumentException("Thời gian kết thúc phải sau thời gian bắt đầu");
         }
-    }
-
-    private void validateDriverNotInAnotherActiveTripForCreate(UserAccount driver) {
-        if (tripRepository.existsByDriverAndStatusIn(driver, ACTIVE_TRIP_STATUSES)) {
-            throw new IllegalArgumentException("Tài xế này đang nằm trong chuyến chưa hoàn tất");
-        }
-    }
-
-    private void validateVehicleNotInAnotherActiveTripForCreate(Vehicle vehicle) {
-        if (tripRepository.existsByVehicleAndStatusIn(vehicle, ACTIVE_TRIP_STATUSES)) {
-            throw new IllegalArgumentException("Xe này đang nằm trong chuyến chưa hoàn tất");
-        }
-    }
-
-    private void validateDriverNotInAnotherActiveTripForUpdate(UserAccount driver, Long tripId) {
-        if (tripRepository.existsByDriverAndStatusInAndIdNot(driver, ACTIVE_TRIP_STATUSES, tripId)) {
-            throw new IllegalArgumentException("Tài xế này đang nằm trong chuyến chưa hoàn tất khác");
-        }
-    }
-
-    private void validateVehicleNotInAnotherActiveTripForUpdate(Vehicle vehicle, Long tripId) {
-        if (tripRepository.existsByVehicleAndStatusInAndIdNot(vehicle, ACTIVE_TRIP_STATUSES, tripId)) {
-            throw new IllegalArgumentException("Xe này đang nằm trong chuyến chưa hoàn tất khác");
-        }
-    }
-
-    private boolean isActiveTripStatus(TripStatus status) {
-        return status == TripStatus.PLANNED || status == TripStatus.IN_PROGRESS;
     }
 
     private String normalizeText(String value) {

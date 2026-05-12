@@ -10,6 +10,7 @@ N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\driver\entity\Driver
 N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\driver\repository\DriverProfileRepository.java
 N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\driver\service\DriverService.java
 N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\QuanlyvantaiApplication.java
+N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\trip\controller\TripController.java
 N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\trip\dto\TripForm.java
 N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\trip\entity\Trip.java
 N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\trip\entity\TripStatus.java

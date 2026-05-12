@@ -13,7 +13,7 @@ import java.util.List;
 public interface TripRepository extends JpaRepository<Trip, Long> {
 
     @EntityGraph(attributePaths = {"driver", "vehicle"})
-    List<Trip> findAllByOrderByPlannedStartTimeDesc();
+    List<Trip> findAllByOrderByIdAsc();
 
     boolean existsByTripCodeIgnoreCase(String tripCode);
 

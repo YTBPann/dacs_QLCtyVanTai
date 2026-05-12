@@ -167,11 +167,11 @@
         <h2 th:text="${formTitle}">Tạo chuyến mới</h2>
 
         <div th:if="${#lists.isEmpty(drivers)}" class="warning">
-            Hiện không có tài xế khả dụng. Tài xế phải đang active và không nằm trong chuyến PLANNED / IN_PROGRESS khác.
+            Hiện không có tài xế khả dụng. Tài xế phải là DRIVER và đang được bật đăng nhập.
         </div>
 
         <div th:if="${#lists.isEmpty(vehicles)}" class="warning">
-            Hiện không có xe khả dụng. Xe phải đang active và không nằm trong chuyến PLANNED / IN_PROGRESS khác.
+            Hiện không có xe khả dụng. Xe phải đang được bật hoạt động.
         </div>
 
         <form th:object="${tripForm}"

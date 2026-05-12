@@ -27,9 +27,9 @@
         }
 
         .container {
-            max-width: 1280px;
+            max-width: 1530px;
             margin: 28px auto;
-            padding: 0 20px;
+            padding: 0 30px;
         }
 
         .page-top {
@@ -75,7 +75,7 @@
         }
 
         .btn-small {
-            padding: 6px 9px;
+            padding: 7px 12px;
             font-size: 13px;
         }
 
@@ -112,7 +112,7 @@
 
         th, td {
             border-bottom: 1px solid #e5e7eb;
-            padding: 10px 10px;
+            padding: 12px 12px;
             vertical-align: middle;
             color: #1e293b;
             font-size: 14px;
@@ -136,19 +136,18 @@
 
         .col-code {
             width: 10%;
-            font-weight: 700;
         }
 
         .col-driver {
-            width: 14%;
+            width: 13%;
         }
 
         .col-vehicle {
-            width: 11%;
+            width: 10%;
         }
 
         .col-route {
-            width: 19%;
+            width: 17%;
         }
 
         .col-time {
@@ -156,21 +155,23 @@
         }
 
         .col-notes {
-            width: 13%;
+            width: 12%;
         }
 
         .col-status {
-            width: 10%;
+            width: 16%;
             text-align: center;
+            padding-right: 24px;
         }
 
         .col-actions {
-            width: 4%;
+            width: 6%;
             text-align: center;
+            padding-left: 16px;
         }
 
         .cell-main {
-            font-weight: 600;
+            font-weight: 700;
             color: #0f172a;
             line-height: 1.35;
         }
@@ -178,20 +179,42 @@
         .cell-sub {
             color: #64748b;
             font-size: 13px;
-            margin-top: 2px;
+            margin-top: 3px;
             line-height: 1.35;
+        }
+
+        .driver-box {
+            text-align: left;
+            line-height: 1.35;
+        }
+
+        .driver-name {
+            font-weight: 700;
+            color: #0f172a;
+            font-size: 14px;
+        }
+
+        .driver-separator {
+            color: #334155;
+            font-size: 14px;
+            line-height: 1.2;
+        }
+
+        .driver-code {
+            color: #0f172a;
+            font-size: 14px;
         }
 
         .route-line,
         .time-line {
             margin-bottom: 4px;
-            line-height: 1.35;
+            line-height: 1.4;
         }
 
         .route-label,
         .time-label {
             color: #64748b;
-            font-weight: 600;
+            font-weight: 700;
         }
 
         .notes-text {
@@ -202,19 +225,28 @@
 
         .status-form {
             display: flex;
-            gap: 6px;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
+            gap: 10px;
+            min-width: 230px;
         }
 
         .status-form select {
-            width: 100%;
-            max-width: 130px;
-            padding: 6px 7px;
-            border-radius: 5px;
+            width: 150px;
+            height: 36px;
+            padding: 0 8px;
+            border-radius: 6px;
             border: 1px solid #cbd5e1;
             font-size: 13px;
             background: white;
+        }
+
+        .status-form button,
+        .col-actions .btn {
+            height: 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .empty {
@@ -223,14 +255,20 @@
             padding: 24px;
         }
 
-        @media (max-width: 1100px) {
+        @media (max-width: 1250px) {
             .container {
                 max-width: 100%;
                 padding: 0 12px;
             }
 
             th, td {
-                padding: 8px 7px;
+                padding: 9px 7px;
+                font-size: 13px;
+            }
+
+            .driver-name,
+            .driver-separator,
+            .driver-code {
                 font-size: 13px;
             }
 
@@ -239,8 +277,17 @@
             }
 
             .btn-small {
-                padding: 5px 7px;
+                padding: 6px 8px;
                 font-size: 12px;
+            }
+
+            .status-form {
+                min-width: 210px;
+                gap: 8px;
+            }
+
+            .status-form select {
+                width: 140px;
             }
         }
     </style>
@@ -293,9 +340,15 @@
                 </td>
 
                 <td class="col-driver">
-                    <div class="cell-main"
-                         th:text="${(trip.driver.fullName != null && !#strings.isEmpty(trip.driver.fullName) ? trip.driver.fullName : trip.driver.username) + ' - ' + trip.driver.username}">
-                        Tài xế số 1 - driver1
+                    <div class="driver-box">
+                        <div class="driver-name"
+                             th:text="${trip.driver.fullName != null && !#strings.isEmpty(trip.driver.fullName) ? trip.driver.fullName : trip.driver.username}">
+                            Tài xế số 1
+                        </div>
+                        <div class="driver-separator">-</div>
+                        <div class="driver-code" th:text="${trip.driver.username}">
+                            driver1
+                        </div>
                     </div>
                 </td>
 
@@ -306,11 +359,11 @@
 
                 <td class="col-route">
                     <div class="route-line">
-                        <span class="route-label">Đi:</span>
+                        <span class="route-label">Lấy:</span>
                         <span th:text="${trip.departurePoint}">Hồ Chí Minh</span>
                     </div>
                     <div class="route-line">
-                        <span class="route-label">Đến:</span>
+                        <span class="route-label">Giao:</span>
                         <span th:text="${trip.destinationPoint}">Bình Dương</span>
                     </div>
                 </td>
@@ -318,14 +371,14 @@
                 <td class="col-time">
                     <div class="time-line">
                         <span class="time-label">Bắt đầu:</span>
-                        <span th:text="${#temporals.format(trip.plannedStartTime, 'dd/MM/yyyy HH:mm')}">
-                            11/11/2026 00:33
+                        <span th:text="${#temporals.format(trip.plannedStartTime, 'dd-MM-yyyy HH:mm')}">
+                            12-05-2026 08:30
                         </span>
                     </div>
                     <div class="time-line">
                         <span class="time-label">Kết thúc:</span>
-                        <span th:text="${#temporals.format(trip.plannedEndTime, 'dd/MM/yyyy HH:mm')}">
-                            11/11/2026 17:30
+                        <span th:text="${#temporals.format(trip.plannedEndTime, 'dd-MM-yyyy HH:mm')}">
+                            12-05-2026 17:30
                         </span>
                     </div>
                 </td>

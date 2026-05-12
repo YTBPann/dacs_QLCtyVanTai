@@ -11,14 +11,14 @@
         .user-table {
             border-collapse: collapse;
             width: 100%;
-            max-width: 980px;
+            max-width: 1080px;
             table-layout: fixed;
         }
 
         .user-table th,
         .user-table td {
             border: 1px solid #999;
-            padding: 8px 10px;
+            padding: 9px 12px;
             vertical-align: middle;
             word-wrap: break-word;
         }
@@ -28,13 +28,33 @@
             text-align: center;
         }
 
-        .col-id { width: 50px; text-align: center; }
-        .col-username { width: 140px; }
-        .col-fullname { width: 180px; }
-        .col-role { width: 110px; text-align: center; }
-        .col-status { width: 150px; text-align: center; }
-        .col-action { width: 150px; text-align: center; }
-        .col-edit { width: 90px; text-align: center; }
+        .col-id {
+            width: 50px;
+            text-align: center;
+        }
+
+        .col-username {
+            width: 150px;
+        }
+
+        .col-fullname {
+            width: 210px;
+        }
+
+        .col-role {
+            width: 110px;
+            text-align: center;
+        }
+
+        .col-status {
+            width: 160px;
+            text-align: center;
+        }
+
+        .col-action {
+            width: 130px;
+            text-align: center;
+        }
 
         .flash-success {
             color: #15803d;
@@ -54,6 +74,7 @@
             font-size: 13px;
             font-weight: 600;
             text-align: center;
+            box-sizing: border-box;
         }
 
         .status-active {
@@ -69,10 +90,12 @@
         .status-admin {
             background: #e5e7eb;
             color: #374151;
+            min-width: 0;
+            width: 100%;
         }
 
         .btn {
-            padding: 6px 10px;
+            padding: 7px 10px;
             border: 1px solid #999;
             border-radius: 6px;
             background: #f8f9fa;
@@ -80,6 +103,11 @@
             text-decoration: none;
             display: inline-block;
             color: #111827;
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+            box-sizing: border-box;
+            width: 100%;
         }
 
         .btn:hover {
@@ -116,8 +144,14 @@
             background: #bfdbfe;
         }
 
-        .inline-form {
-            display: inline;
+        .action-group {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 6px;
+        }
+
+        .action-group form {
             margin: 0;
         }
     </style>
@@ -146,10 +180,10 @@
         <th class="col-fullname">Họ và tên</th>
         <th class="col-role">Role</th>
         <th class="col-status">Trạng thái</th>
-        <th class="col-action">Hành động</th>
-        <th class="col-edit">Sửa</th>
+        <th class="col-action">Thao tác</th>
     </tr>
     </thead>
+
     <tbody>
     <tr th:each="user : ${users}">
         <td class="col-id" th:text="${user.id}"></td>
@@ -163,33 +197,41 @@
         </td>
 
         <td class="col-action">
-            <span th:if="${user.role.name() == 'ADMIN'}" class="status-badge status-admin">Không cho phép</span>
+            <div class="action-group">
+                <span th:if="${user.role.name() == 'ADMIN'}"
+                      class="status-badge status-admin">
+                    Không cho phép
+                </span>
 
-            <form th:if="${user.role.name() != 'ADMIN' and user.enabled}"
-                  th:action="@{/users/{id}/disable(id=${user.id})}"
-                  method="post"
-                  class="inline-form">
-                <input type="hidden"
-                       th:if="${_csrf != null}"
-                       th:name="${_csrf.parameterName}"
-                       th:value="${_csrf.token}">
-                <button type="submit" class="btn btn-danger">Tắt tài khoản</button>
-            </form>
+                <form th:if="${user.role.name() != 'ADMIN' and user.enabled}"
+                      th:action="@{/users/{id}/disable(id=${user.id})}"
+                      method="post">
+                    <input type="hidden"
+                           th:if="${_csrf != null}"
+                           th:name="${_csrf.parameterName}"
+                           th:value="${_csrf.token}">
+                    <button type="submit" class="btn btn-danger">
+                        Tắt tài khoản
+                    </button>
+                </form>
 
-            <form th:if="${user.role.name() != 'ADMIN' and !user.enabled}"
-                  th:action="@{/users/{id}/enable(id=${user.id})}"
-                  method="post"
-                  class="inline-form">
-                <input type="hidden"
-                       th:if="${_csrf != null}"
-                       th:name="${_csrf.parameterName}"
-                       th:value="${_csrf.token}">
-                <button type="submit" class="btn btn-success">Bật tài khoản</button>
-            </form>
-        </td>
+                <form th:if="${user.role.name() != 'ADMIN' and !user.enabled}"
+                      th:action="@{/users/{id}/enable(id=${user.id})}"
+                      method="post">
+                    <input type="hidden"
+                           th:if="${_csrf != null}"
+                           th:name="${_csrf.parameterName}"
+                           th:value="${_csrf.token}">
+                    <button type="submit" class="btn btn-success">
+                        Bật tài khoản
+                    </button>
+                </form>
 
-        <td class="col-edit">
-            <a th:href="@{/users/{id}/edit(id=${user.id})}" class="btn btn-edit">Sửa</a>
+                <a th:href="@{/users/{id}/edit(id=${user.id})}"
+                   class="btn btn-edit">
+                    Sửa
+                </a>
+            </div>
         </td>
     </tr>
     </tbody>
