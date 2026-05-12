@@ -2,6 +2,7 @@ package com.ytbpann.quanlyvantai.user.service;
 
 import com.ytbpann.quanlyvantai.driver.entity.DriverProfile;
 import com.ytbpann.quanlyvantai.driver.repository.DriverProfileRepository;
+import com.ytbpann.quanlyvantai.user.dto.UserChangePasswordRequest;
 import com.ytbpann.quanlyvantai.user.dto.UserCreateRequest;
 import com.ytbpann.quanlyvantai.user.dto.UserUpdateRequest;
 import com.ytbpann.quanlyvantai.user.entity.RoleName;
@@ -171,6 +172,39 @@ public class UserManagementService {
 
         if (newPassword == null || newPassword.isBlank()) {
             throw new IllegalArgumentException("Mật khẩu mới không được để trống");
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userAccountRepository.save(user);
+    }
+
+    @Transactional
+    public void changeOwnPassword(String username, UserChangePasswordRequest request) {
+        UserAccount user = userAccountRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy tài khoản đang đăng nhập"));
+
+        String currentPassword = request.getCurrentPassword();
+        String newPassword = request.getNewPassword();
+        String confirmNewPassword = request.getConfirmNewPassword();
+
+        if (currentPassword == null || currentPassword.isBlank()) {
+            throw new IllegalArgumentException("Mật khẩu hiện tại không được để trống");
+        }
+
+        if (newPassword == null || newPassword.isBlank()) {
+            throw new IllegalArgumentException("Mật khẩu mới không được để trống");
+        }
+
+        if (confirmNewPassword == null || confirmNewPassword.isBlank()) {
+            throw new IllegalArgumentException("Vui lòng nhập lại mật khẩu mới");
+        }
+
+        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+            throw new IllegalArgumentException("Mật khẩu hiện tại không đúng");
+        }
+
+        if (!newPassword.equals(confirmNewPassword)) {
+            throw new IllegalArgumentException("Mật khẩu mới và nhập lại mật khẩu mới không khớp");
         }
 
         user.setPassword(passwordEncoder.encode(newPassword));

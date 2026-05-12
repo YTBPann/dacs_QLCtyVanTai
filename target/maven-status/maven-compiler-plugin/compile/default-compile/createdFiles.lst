@@ -1,7 +1,11 @@
 com\ytbpann\quanlyvantai\driver\service\DriverService.class
+com\ytbpann\quanlyvantai\user\dto\UserUpdateRequest.class
 com\ytbpann\quanlyvantai\user\repository\UserAccountRepository.class
 com\ytbpann\quanlyvantai\user\entity\RoleName.class
+com\ytbpann\quanlyvantai\user\service\UserManagementService.class
 com\ytbpann\quanlyvantai\dashboard\controller\DashboardController.class
+com\ytbpann\quanlyvantai\user\dto\UserResetPasswordRequest.class
+com\ytbpann\quanlyvantai\user\controller\UserManagementController.class
 com\ytbpann\quanlyvantai\QuanlyvantaiApplication.class
 com\ytbpann\quanlyvantai\driver\repository\DriverProfileRepository.class
 com\ytbpann\quanlyvantai\config\SecurityConfig.class
@@ -10,6 +14,7 @@ com\ytbpann\quanlyvantai\auth\service\CustomUserDetailsService.class
 com\ytbpann\quanlyvantai\user\entity\UserAccount.class
 com\ytbpann\quanlyvantai\auth\controller\AuthController.class
 com\ytbpann\quanlyvantai\config\DataInitializer.class
+com\ytbpann\quanlyvantai\user\dto\UserCreateRequest.class
 com\ytbpann\quanlyvantai\driver\dto\DriverCreateRequest.class
 com\ytbpann\quanlyvantai\driver\controller\DriverController.class
 com\ytbpann\quanlyvantai\driver\dto\DriverUpdateRequest.class
