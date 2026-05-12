@@ -12,6 +12,8 @@ N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\driver\service\Drive
 N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\QuanlyvantaiApplication.java
 N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\user\controller\UserManagementController.java
 N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\user\dto\UserCreateRequest.java
+N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\user\dto\UserResetPasswordRequest.java
+N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\user\dto\UserUpdateRequest.java
 N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\user\entity\RoleName.java
 N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\user\entity\UserAccount.java
 N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\user\repository\UserAccountRepository.java

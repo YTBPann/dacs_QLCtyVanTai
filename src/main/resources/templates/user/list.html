@@ -3,12 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <title>Danh sách user</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .user-table {
+            border-collapse: collapse;
+            width: 100%;
+            max-width: 980px;
+            table-layout: fixed;
+        }
+
+        .user-table th,
+        .user-table td {
+            border: 1px solid #999;
+            padding: 8px 10px;
+            vertical-align: middle;
+            word-wrap: break-word;
+        }
+
+        .user-table th {
+            background: #f3f4f6;
+            text-align: center;
+        }
+
+        .col-id { width: 50px; text-align: center; }
+        .col-username { width: 140px; }
+        .col-fullname { width: 180px; }
+        .col-role { width: 110px; text-align: center; }
+        .col-status { width: 150px; text-align: center; }
+        .col-action { width: 150px; text-align: center; }
+        .col-edit { width: 90px; text-align: center; }
+
+        .flash-success {
+            color: #15803d;
+            margin-bottom: 12px;
+        }
+
+        .flash-error {
+            color: #dc2626;
+            margin-bottom: 12px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            min-width: 120px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .status-active {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-locked {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-admin {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .btn {
+            padding: 6px 10px;
+            border: 1px solid #999;
+            border-radius: 6px;
+            background: #f8f9fa;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            color: #111827;
+        }
+
+        .btn:hover {
+            background: #eceff3;
+        }
+
+        .btn-danger {
+            background: #fee2e2;
+            border-color: #fca5a5;
+            color: #991b1b;
+        }
+
+        .btn-danger:hover {
+            background: #fecaca;
+        }
+
+        .btn-success {
+            background: #dcfce7;
+            border-color: #86efac;
+            color: #166534;
+        }
+
+        .btn-success:hover {
+            background: #bbf7d0;
+        }
+
+        .btn-edit {
+            background: #dbeafe;
+            border-color: #93c5fd;
+            color: #1e40af;
+        }
+
+        .btn-edit:hover {
+            background: #bfdbfe;
+        }
+
+        .inline-form {
+            display: inline;
+            margin: 0;
+        }
+    </style>
 </head>
 <body>
 <h1>Quản lý người dùng</h1>
 
-<div th:if="${successMessage}" style="color: green;">
+<div th:if="${successMessage}" class="flash-success">
     <p th:text="${successMessage}"></p>
+</div>
+
+<div th:if="${errorMessage}" class="flash-error">
+    <p th:text="${errorMessage}"></p>
 </div>
 
 <p>
@@ -16,40 +138,58 @@
     <a th:href="@{/users/create}">Tạo user mới</a>
 </p>
 
-<table border="1" cellpadding="8" cellspacing="0">
+<table class="user-table">
     <thead>
     <tr>
-        <th>ID</th>
-        <th>Username</th>
-        <th>Họ và tên</th>
-        <th>Role</th>
-        <th>Trạng thái</th>
-        <th>Hành động</th>
+        <th class="col-id">ID</th>
+        <th class="col-username">Username</th>
+        <th class="col-fullname">Họ và tên</th>
+        <th class="col-role">Role</th>
+        <th class="col-status">Trạng thái</th>
+        <th class="col-action">Hành động</th>
+        <th class="col-edit">Sửa</th>
     </tr>
     </thead>
     <tbody>
     <tr th:each="user : ${users}">
-        <td th:text="${user.id}"></td>
-        <td th:text="${user.username}"></td>
-        <td th:text="${user.fullName}"></td>
-        <td th:text="${user.role}"></td>
-        <td th:text="${user.enabled ? 'Đang hoạt động' : 'Đã tắt'}"></td>
-        <td>
-            <span th:if="${user.role.name() == 'ADMIN'}">Không cho phép</span>
+        <td class="col-id" th:text="${user.id}"></td>
+        <td class="col-username" th:text="${user.username}"></td>
+        <td class="col-fullname" th:text="${user.fullName}"></td>
+        <td class="col-role" th:text="${user.role}"></td>
+
+        <td class="col-status">
+            <span th:if="${user.enabled}" class="status-badge status-active">Đang hoạt động</span>
+            <span th:if="${!user.enabled}" class="status-badge status-locked">Đã bị khóa</span>
+        </td>
+
+        <td class="col-action">
+            <span th:if="${user.role.name() == 'ADMIN'}" class="status-badge status-admin">Không cho phép</span>
 
             <form th:if="${user.role.name() != 'ADMIN' and user.enabled}"
                   th:action="@{/users/{id}/disable(id=${user.id})}"
                   method="post"
-                  style="display:inline;">
-                <button type="submit">Tắt</button>
+                  class="inline-form">
+                <input type="hidden"
+                       th:if="${_csrf != null}"
+                       th:name="${_csrf.parameterName}"
+                       th:value="${_csrf.token}">
+                <button type="submit" class="btn btn-danger">Tắt tài khoản</button>
             </form>
 
             <form th:if="${user.role.name() != 'ADMIN' and !user.enabled}"
                   th:action="@{/users/{id}/enable(id=${user.id})}"
                   method="post"
-                  style="display:inline;">
-                <button type="submit">Bật</button>
+                  class="inline-form">
+                <input type="hidden"
+                       th:if="${_csrf != null}"
+                       th:name="${_csrf.parameterName}"
+                       th:value="${_csrf.token}">
+                <button type="submit" class="btn btn-success">Bật tài khoản</button>
             </form>
+        </td>
+
+        <td class="col-edit">
+            <a th:href="@{/users/{id}/edit(id=${user.id})}" class="btn btn-edit">Sửa</a>
         </td>
     </tr>
     </tbody>

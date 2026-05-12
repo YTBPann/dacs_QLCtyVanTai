@@ -10,6 +10,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.ytbpann.quanlyvantai.user.dto.UserUpdateRequest;
 
 import java.util.List;
 
@@ -105,6 +106,64 @@ public class UserManagementService {
 
             driverProfileRepository.save(driverProfile);
         }
+    }
+
+    @Transactional(readOnly = true)
+    public UserUpdateRequest getUpdateRequest(Long userId) {
+        UserAccount user = userAccountRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy user với id = " + userId));
+
+        UserUpdateRequest request = new UserUpdateRequest();
+        request.setUsername(user.getUsername());
+        request.setFullName(user.getFullName());
+        request.setEnabled(user.isEnabled());
+
+        return request;
+    }
+
+    @Transactional
+    public void updateUser(Long userId, UserUpdateRequest request) {
+        UserAccount user = userAccountRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy user với id = " + userId));
+
+        String username = safeTrim(request.getUsername());
+        String fullName = safeTrim(request.getFullName());
+
+        if (username == null || username.isBlank()) {
+            throw new IllegalArgumentException("Username không được để trống");
+        }
+
+        if (fullName == null || fullName.isBlank()) {
+            throw new IllegalArgumentException("Họ và tên không được để trống");
+        }
+
+        if (userAccountRepository.existsByUsernameAndIdNot(username, userId)) {
+            throw new IllegalArgumentException("Username đã tồn tại");
+        }
+
+        user.setUsername(username);
+        user.setFullName(fullName);
+
+        if (user.getRole() == RoleName.ADMIN) {
+            user.setEnabled(true);
+        } else {
+            user.setEnabled(request.isEnabled());
+        }
+
+        userAccountRepository.save(user);
+    }
+
+    @Transactional
+    public void resetPassword(Long userId, String newPassword) {
+        UserAccount user = userAccountRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy user với ID: " + userId));
+
+        if (user.getRole() == RoleName.ADMIN) {
+            throw new IllegalArgumentException("Không được reset mật khẩu tài khoản ADMIN ở phase này");
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userAccountRepository.save(user);
     }
 
     private String safeTrim(String value) {
