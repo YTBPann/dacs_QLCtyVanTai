@@ -61,6 +61,10 @@
             margin-bottom: 10px;
         }
 
+        .action-link:hover {
+            background: #1d4ed8;
+        }
+
         .success-message {
             background: #dcfce7;
             color: #166534;
@@ -117,9 +121,12 @@
                th:href="@{/admin/vehicles}">
                 Quản lý xe
             </a>
-            
-            <a th:href="@{/admin/trips}" class="btn">Quản lý chuyến</a>
 
+            <a class="action-link"
+               th:if="${role != null and role.toString() == 'ADMIN'}"
+               th:href="@{/admin/trips}">
+                Quản lý chuyến
+            </a>
         </div>
 
         <hr>

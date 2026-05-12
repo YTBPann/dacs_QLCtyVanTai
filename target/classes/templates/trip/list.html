@@ -42,6 +42,7 @@
         .page-top h2 {
             margin: 0;
             color: #0f172a;
+            font-size: 24px;
         }
 
         .btn {
@@ -60,9 +61,17 @@
             color: white;
         }
 
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+
         .btn-secondary {
             background: #64748b;
             color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #475569;
         }
 
         .btn-small {
@@ -92,21 +101,21 @@
             background: white;
             border-radius: 10px;
             box-shadow: 0 2px 10px rgba(15, 23, 42, 0.08);
-            overflow-x: auto;
+            overflow: hidden;
         }
 
         table {
             width: 100%;
-            min-width: 1180px;
             border-collapse: collapse;
             table-layout: fixed;
         }
 
         th, td {
             border-bottom: 1px solid #e5e7eb;
-            padding: 10px 12px;
+            padding: 10px 10px;
             vertical-align: middle;
-            word-wrap: break-word;
+            color: #1e293b;
+            font-size: 14px;
         }
 
         th {
@@ -116,111 +125,123 @@
             font-weight: 700;
         }
 
-        td {
-            color: #1e293b;
-            font-size: 14px;
+        tr:last-child td {
+            border-bottom: none;
         }
 
         .col-stt {
-            width: 54px;
+            width: 4%;
             text-align: center;
         }
 
         .col-code {
-            width: 110px;
+            width: 10%;
             font-weight: 700;
         }
 
         .col-driver {
-            width: 150px;
+            width: 14%;
         }
 
         .col-vehicle {
-            width: 140px;
+            width: 11%;
         }
 
         .col-route {
-            width: 220px;
+            width: 19%;
         }
 
         .col-time {
-            width: 170px;
-        }
-
-        .col-status {
-            width: 135px;
-            text-align: center;
+            width: 15%;
         }
 
         .col-notes {
-            width: 220px;
+            width: 13%;
         }
 
-        .col-actions {
-            width: 170px;
+        .col-status {
+            width: 10%;
             text-align: center;
         }
 
-        .route-line {
-            margin-bottom: 4px;
+        .col-actions {
+            width: 4%;
+            text-align: center;
         }
 
-        .route-label {
+        .cell-main {
+            font-weight: 600;
+            color: #0f172a;
+            line-height: 1.35;
+        }
+
+        .cell-sub {
+            color: #64748b;
+            font-size: 13px;
+            margin-top: 2px;
+            line-height: 1.35;
+        }
+
+        .route-line,
+        .time-line {
+            margin-bottom: 4px;
+            line-height: 1.35;
+        }
+
+        .route-label,
+        .time-label {
             color: #64748b;
             font-weight: 600;
         }
 
-        .time-line {
-            margin-bottom: 4px;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 5px 9px;
-            border-radius: 999px;
-            font-size: 12px;
-            font-weight: 700;
-        }
-
-        .badge-planned {
-            background: #dbeafe;
-            color: #1d4ed8;
-        }
-
-        .badge-in-progress {
-            background: #fef3c7;
-            color: #92400e;
-        }
-
-        .badge-completed {
-            background: #dcfce7;
-            color: #166534;
-        }
-
-        .badge-cancelled {
-            background: #fee2e2;
-            color: #991b1b;
+        .notes-text {
+            line-height: 1.4;
+            white-space: normal;
+            word-break: break-word;
         }
 
         .status-form {
-            margin-top: 8px;
             display: flex;
             gap: 6px;
             justify-content: center;
+            align-items: center;
         }
 
         .status-form select {
-            max-width: 115px;
-            padding: 5px;
+            width: 100%;
+            max-width: 130px;
+            padding: 6px 7px;
             border-radius: 5px;
             border: 1px solid #cbd5e1;
-            font-size: 12px;
+            font-size: 13px;
+            background: white;
         }
 
         .empty {
             text-align: center;
             color: #64748b;
-            padding: 22px;
+            padding: 24px;
+        }
+
+        @media (max-width: 1100px) {
+            .container {
+                max-width: 100%;
+                padding: 0 12px;
+            }
+
+            th, td {
+                padding: 8px 7px;
+                font-size: 13px;
+            }
+
+            .cell-sub {
+                font-size: 12px;
+            }
+
+            .btn-small {
+                padding: 5px 7px;
+                font-size: 12px;
+            }
         }
     </style>
 </head>
@@ -253,10 +274,10 @@
                 <th class="col-driver">Tài xế</th>
                 <th class="col-vehicle">Xe</th>
                 <th class="col-route">Tuyến đường</th>
-                <th class="col-time">Thời gian dự kiến</th>
-                <th class="col-status">Trạng thái</th>
+                <th class="col-time">Thời gian</th>
                 <th class="col-notes">Ghi chú</th>
-                <th class="col-actions">Thao tác</th>
+                <th class="col-status">Trạng thái</th>
+                <th class="col-actions">Sửa</th>
             </tr>
             </thead>
             <tbody>
@@ -267,66 +288,69 @@
             <tr th:each="trip, iter : ${trips}">
                 <td class="col-stt" th:text="${iter.count}">1</td>
 
-                <td class="col-code" th:text="${trip.tripCode}">TRIP001</td>
+                <td class="col-code">
+                    <div class="cell-main" th:text="${trip.tripCode}">TRIP001</div>
+                </td>
 
                 <td class="col-driver">
-                    <div th:text="${trip.driver.fullName != null && !#strings.isEmpty(trip.driver.fullName) ? trip.driver.fullName : trip.driver.username}">
-                        Nguyễn Văn A
+                    <div class="cell-main"
+                         th:text="${(trip.driver.fullName != null && !#strings.isEmpty(trip.driver.fullName) ? trip.driver.fullName : trip.driver.username) + ' - ' + trip.driver.username}">
+                        Tài xế số 1 - driver1
                     </div>
-                    <small th:text="${trip.driver.username}">driver01</small>
                 </td>
 
                 <td class="col-vehicle">
-                    <div th:text="${trip.vehicle.licensePlate}">51A-12345</div>
-                    <small th:text="${trip.vehicle.vehicleType}">Xe tải</small>
+                    <div class="cell-main" th:text="${trip.vehicle.licensePlate}">51C-123.59</div>
+                    <div class="cell-sub" th:text="${trip.vehicle.vehicleType}">Xe tải</div>
                 </td>
 
                 <td class="col-route">
                     <div class="route-line">
                         <span class="route-label">Đi:</span>
-                        <span th:text="${trip.departurePoint}">TP.HCM</span>
+                        <span th:text="${trip.departurePoint}">Hồ Chí Minh</span>
                     </div>
                     <div class="route-line">
                         <span class="route-label">Đến:</span>
-                        <span th:text="${trip.destinationPoint}">Cần Thơ</span>
+                        <span th:text="${trip.destinationPoint}">Bình Dương</span>
                     </div>
                 </td>
 
                 <td class="col-time">
                     <div class="time-line">
-                        <span class="route-label">Bắt đầu:</span>
-                        <span th:text="${#temporals.format(trip.plannedStartTime, 'dd/MM/yyyy HH:mm')}">12/05/2026 08:00</span>
+                        <span class="time-label">Bắt đầu:</span>
+                        <span th:text="${#temporals.format(trip.plannedStartTime, 'dd/MM/yyyy HH:mm')}">
+                            11/11/2026 00:33
+                        </span>
                     </div>
                     <div class="time-line">
-                        <span class="route-label">Kết thúc:</span>
-                        <span th:text="${#temporals.format(trip.plannedEndTime, 'dd/MM/yyyy HH:mm')}">12/05/2026 18:00</span>
+                        <span class="time-label">Kết thúc:</span>
+                        <span th:text="${#temporals.format(trip.plannedEndTime, 'dd/MM/yyyy HH:mm')}">
+                            11/11/2026 17:30
+                        </span>
+                    </div>
+                </td>
+
+                <td class="col-notes">
+                    <div class="notes-text"
+                         th:text="${trip.notes != null && !#strings.isEmpty(trip.notes) ? trip.notes : '-'}">
+                        -
                     </div>
                 </td>
 
                 <td class="col-status">
-                    <span class="badge"
-                          th:classappend="${trip.status.name() == 'PLANNED'} ? ' badge-planned' :
-                                          (${trip.status.name() == 'IN_PROGRESS'} ? ' badge-in-progress' :
-                                          (${trip.status.name() == 'COMPLETED'} ? ' badge-completed' : ' badge-cancelled'))"
-                          th:text="${trip.status}">
-                        PLANNED
-                    </span>
-
                     <form class="status-form"
                           th:action="@{/admin/trips/{id}/status(id=${trip.id})}"
                           method="post">
                         <select name="status">
                             <option th:each="status : ${statuses}"
                                     th:value="${status}"
-                                    th:text="${status}"
+                                    th:text="${status.displayName}"
                                     th:selected="${status == trip.status}">
                             </option>
                         </select>
                         <button type="submit" class="btn btn-secondary btn-small">Lưu</button>
                     </form>
                 </td>
-
-                <td class="col-notes" th:text="${trip.notes != null && !#strings.isEmpty(trip.notes) ? trip.notes : '-'}">-</td>
 
                 <td class="col-actions">
                     <a class="btn btn-primary btn-small"

@@ -152,7 +152,11 @@
         <strong>Quản lý vận tải</strong>
     </div>
     <div>
-        <a th:href="@{/admin/trips}">Danh sách chuyến</a>
+        <a class="action-link"
+            th:if="${role != null and role.toString() == 'ADMIN'}"
+            th:href="@{/admin/trips}">
+                Quản lý chuyến
+        </a>
         <a th:href="@{/dashboard}">Dashboard</a>
         <a th:href="@{/logout}">Đăng xuất</a>
     </div>
@@ -190,7 +194,7 @@
                     <select id="status" th:field="*{status}">
                         <option th:each="status : ${statuses}"
                                 th:value="${status}"
-                                th:text="${status}">
+                                th:text="${status.displayName}">
                         </option>
                     </select>
                     <div class="error" th:if="${#fields.hasErrors('status')}" th:errors="*{status}"></div>
@@ -221,13 +225,13 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="departurePoint">Điểm đi</label>
+                    <label for="departurePoint">Điểm lấy hàng</label>
                     <input id="departurePoint" type="text" th:field="*{departurePoint}" placeholder="VD: Kho TP.HCM">
                     <div class="error" th:if="${#fields.hasErrors('departurePoint')}" th:errors="*{departurePoint}"></div>
                 </div>
 
                 <div class="form-group">
-                    <label for="destinationPoint">Điểm đến</label>
+                    <label for="destinationPoint">Điểm giao hàng</label>
                     <input id="destinationPoint" type="text" th:field="*{destinationPoint}" placeholder="VD: Kho Cần Thơ">
                     <div class="error" th:if="${#fields.hasErrors('destinationPoint')}" th:errors="*{destinationPoint}"></div>
                 </div>
