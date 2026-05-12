@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${pageTitle}">Cập nhật tài xế</title>
+</head>
+<body>
+<h1 th:text="${pageTitle}">Cập nhật tài xế</h1>
+
+<div th:if="${successMessage}" style="color: green; margin-bottom: 12px;">
+    <span th:text="${successMessage}"></span>
+</div>
+
+<div th:if="${errorMessage}" style="color: red; margin-bottom: 12px;">
+    <span th:text="${errorMessage}"></span>
+</div>
+
+<p style="margin-bottom: 12px;">
+    Trạng thái đăng nhập của tài xế được quản lý tại trang Quản lý người dùng.
+</p>
+
+<form th:action="@{/admin/drivers/{id}/edit(id=${driverId})}"
+      th:object="${driverUpdateRequest}"
+      method="post">
+
+    <input type="hidden" th:field="*{active}">
+
+    <div style="margin-bottom: 10px;">
+        <label for="driverCode">Mã tài xế</label><br>
+        <input type="text" id="driverCode" th:field="*{driverCode}" style="width: 320px;">
+    </div>
+
+    <div style="margin-bottom: 10px;">
+        <label for="fullName">Họ tên</label><br>
+        <input type="text" id="fullName" th:field="*{fullName}" style="width: 320px;">
+    </div>
+
+    <div style="margin-bottom: 10px;">
+        <label for="phoneNumber">Số điện thoại</label><br>
+        <input type="text" id="phoneNumber" th:field="*{phoneNumber}" style="width: 320px;">
+    </div>
+
+    <div style="margin-bottom: 10px;">
+        <label for="licenseNumber">Số GPLX</label><br>
+        <input type="text" id="licenseNumber" th:field="*{licenseNumber}" style="width: 320px;">
+    </div>
+
+    <div style="margin-bottom: 10px;">
+        <label for="licenseExpiryDate">Ngày hết hạn GPLX</label><br>
+        <input type="date" id="licenseExpiryDate" th:field="*{licenseExpiryDate}" style="width: 320px;">
+    </div>
+
+    <div style="margin-bottom: 10px;">
+        <label for="address">Địa chỉ</label><br>
+        <textarea id="address" th:field="*{address}" rows="3" style="width: 320px;"></textarea>
+    </div>
+
+    <div style="margin-bottom: 10px;">
+        <label for="notes">Ghi chú</label><br>
+        <textarea id="notes" th:field="*{notes}" rows="4" style="width: 320px;"></textarea>
+    </div>
+
+    <div style="margin-bottom: 10px;">
+        <label for="linkedUserAccountId">Tài khoản DRIVER liên kết</label><br>
+        <select id="linkedUserAccountId" th:field="*{linkedUserAccountId}" style="width: 328px;">
+            <option th:value="''">-- Không liên kết tài khoản --</option>
+            <option th:each="account : ${availableDriverAccounts}"
+                    th:value="${account.id}"
+                    th:text="${account.username} + ' - ' + ${account.fullName}">
+            </option>
+        </select>
+    </div>
+
+    <div style="margin-top: 16px;">
+        <button type="submit">Lưu cập nhật</button>
+        <a th:href="@{/admin/drivers}" style="margin-left: 10px;">Quay lại danh sách</a>
+    </div>
+</form>
+
+</body>
+</html>

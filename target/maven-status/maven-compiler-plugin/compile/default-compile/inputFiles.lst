@@ -5,6 +5,7 @@ N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\config\SecurityConfi
 N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\dashboard\controller\DashboardController.java
 N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\driver\controller\DriverController.java
 N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\driver\dto\DriverCreateRequest.java
+N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\driver\dto\DriverUpdateRequest.java
 N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\driver\entity\DriverProfile.java
 N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\driver\repository\DriverProfileRepository.java
 N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\driver\service\DriverService.java

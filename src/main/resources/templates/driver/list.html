@@ -11,8 +11,12 @@
     <span th:text="${successMessage}"></span>
 </div>
 
+<div th:if="${errorMessage != null}" style="color: red; margin-bottom: 12px;">
+    <span th:text="${errorMessage}"></span>
+</div>
+
 <p>
-    <a th:href="@{/admin/drivers/create}">Tạo tài xế mới</a>
+    <a th:href="@{/users/create}">Tạo user mới</a>
 </p>
 
 <table border="1" cellpadding="8" cellspacing="0">
@@ -26,21 +30,30 @@
         <th>Hạn GPLX</th>
         <th>Tài khoản liên kết</th>
         <th>Trạng thái</th>
+        <th>Hành động</th>
     </tr>
     </thead>
     <tbody>
     <tr th:if="${#lists.isEmpty(drivers)}">
-        <td colspan="7">Chưa có tài xế nào.</td>
+        <td colspan="9">Chưa có tài xế nào.</td>
     </tr>
+
     <tr th:each="driver : ${drivers}">
         <td th:text="${driver.id}"></td>
         <td th:text="${driver.driverCode}"></td>
         <td th:text="${driver.fullName}"></td>
-        <td th:text="${driver.phoneNumber}"></td>
+        <td th:text="${driver.phoneNumber != null && !driver.phoneNumber.isBlank() ? driver.phoneNumber : '-'}"></td>
         <td th:text="${driver.licenseNumber}"></td>
-        <td th:text="${driver.licenseExpiryDate}"></td>
+        <td th:text="${driver.licenseExpiryDate != null ? driver.licenseExpiryDate : '-'}"></td>
         <td th:text="${driver.linkedUserAccount != null ? driver.linkedUserAccount.username : '-'}"></td>
-        <td th:text="${driver.active ? 'Đang hoạt động' : 'Ngừng hoạt động'}"></td>
+        <td>
+            <span th:if="${driver.linkedUserAccount == null}">Chưa liên kết tài khoản</span>
+            <span th:if="${driver.linkedUserAccount != null}"
+                  th:text="${driver.linkedUserAccount.enabled ? 'Đang hoạt động' : 'Tài khoản đã bị khóa'}"></span>
+        </td>
+        <td>
+            <a th:href="@{/admin/drivers/{id}/edit(id=${driver.id})}">Sửa</a>
+        </td>
     </tr>
     </tbody>
 </table>

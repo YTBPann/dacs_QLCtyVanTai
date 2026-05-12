@@ -11,19 +11,15 @@
     <a th:href="@{/users}">Quay lại danh sách user</a>
 </p>
 
+<div th:if="${errorMessage != null}" style="color:red; margin-bottom: 12px;">
+    <span th:text="${errorMessage}"></span>
+</div>
+
 <form th:action="@{/users/create}" th:object="${userCreateRequest}" method="post">
     <div>
         <label>Username:</label>
         <input type="text" th:field="*{username}">
         <div th:if="${#fields.hasErrors('username')}" th:errors="*{username}" style="color:red;"></div>
-    </div>
-
-    <br>
-
-    <div>
-        <label>Họ và tên:</label>
-        <input type="text" th:field="*{fullName}">
-        <div th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}" style="color:red;"></div>
     </div>
 
     <br>
@@ -37,8 +33,16 @@
     <br>
 
     <div>
+        <label>Họ và tên:</label>
+        <input type="text" th:field="*{fullName}">
+        <div th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}" style="color:red;"></div>
+    </div>
+
+    <br>
+
+    <div>
         <label>Role:</label>
-        <select th:field="*{role}">
+        <select th:field="*{role}" id="roleSelect">
             <option value="">-- Chọn role --</option>
             <option th:each="role : ${roles}" th:value="${role}" th:text="${role}"></option>
         </select>
@@ -47,7 +51,81 @@
 
     <br>
 
+    <div id="driverFields" style="display:none;">
+        <fieldset style="width: fit-content;">
+            <legend>Thông tin hồ sơ tài xế</legend>
+
+            <div>
+                <label>Mã tài xế:</label>
+                <input type="text" th:field="*{driverCode}">
+                <div th:if="${#fields.hasErrors('driverCode')}" th:errors="*{driverCode}" style="color:red;"></div>
+            </div>
+
+            <br>
+
+            <div>
+                <label>Số điện thoại:</label>
+                <input type="text" th:field="*{phoneNumber}">
+                <div th:if="${#fields.hasErrors('phoneNumber')}" th:errors="*{phoneNumber}" style="color:red;"></div>
+            </div>
+
+            <br>
+
+            <div>
+                <label>Địa chỉ:</label>
+                <textarea th:field="*{address}" rows="3" cols="40"></textarea>
+                <div th:if="${#fields.hasErrors('address')}" th:errors="*{address}" style="color:red;"></div>
+            </div>
+
+            <br>
+
+            <div>
+                <label>Số GPLX:</label>
+                <input type="text" th:field="*{licenseNumber}">
+                <div th:if="${#fields.hasErrors('licenseNumber')}" th:errors="*{licenseNumber}" style="color:red;"></div>
+            </div>
+
+            <br>
+
+            <div>
+                <label>Ngày hết hạn GPLX:</label>
+                <input type="date" th:field="*{licenseExpiryDate}">
+                <div th:if="${#fields.hasErrors('licenseExpiryDate')}" th:errors="*{licenseExpiryDate}" style="color:red;"></div>
+            </div>
+
+            <br>
+
+            <div>
+                <label>Ghi chú:</label>
+                <textarea th:field="*{notes}" rows="4" cols="40"></textarea>
+                <div th:if="${#fields.hasErrors('notes')}" th:errors="*{notes}" style="color:red;"></div>
+            </div>
+        </fieldset>
+
+        <br>
+    </div>
+
     <button type="submit">Tạo tài khoản</button>
 </form>
+
+<script>
+    (function () {
+        const roleSelect = document.getElementById('roleSelect');
+        const driverFields = document.getElementById('driverFields');
+
+        function toggleDriverFields() {
+            if (!roleSelect || !driverFields) {
+                return;
+            }
+
+            driverFields.style.display = roleSelect.value === 'DRIVER' ? 'block' : 'none';
+        }
+
+        if (roleSelect) {
+            roleSelect.addEventListener('change', toggleDriverFields);
+            toggleDriverFields();
+        }
+    })();
+</script>
 </body>
 </html>

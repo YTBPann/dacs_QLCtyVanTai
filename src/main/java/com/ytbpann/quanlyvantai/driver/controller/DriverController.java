@@ -1,6 +1,5 @@
 package com.ytbpann.quanlyvantai.driver.controller;
 
-import com.ytbpann.quanlyvantai.driver.dto.DriverCreateRequest;
 import com.ytbpann.quanlyvantai.driver.dto.DriverUpdateRequest;
 import com.ytbpann.quanlyvantai.driver.entity.DriverProfile;
 import com.ytbpann.quanlyvantai.driver.service.DriverService;
@@ -29,39 +28,6 @@ public class DriverController {
         model.addAttribute("pageTitle", "Danh sách tài xế");
         model.addAttribute("drivers", driverService.getAllDrivers());
         return "driver/list";
-    }
-
-    @GetMapping("/create")
-    public String showCreateForm(Model model) {
-        if (!model.containsAttribute("driverCreateRequest")) {
-            model.addAttribute("driverCreateRequest", new DriverCreateRequest());
-        }
-
-        populateCreateFormModel(model);
-        return "driver/create";
-    }
-
-    @PostMapping("/create")
-    public String createDriver(@ModelAttribute("driverCreateRequest") DriverCreateRequest request,
-                               BindingResult bindingResult,
-                               Model model,
-                               RedirectAttributes redirectAttributes) {
-
-        if (bindingResult.hasErrors()) {
-            populateCreateFormModel(model);
-            model.addAttribute("errorMessage", "Dữ liệu không hợp lệ. Vui lòng kiểm tra lại form.");
-            return "driver/create";
-        }
-
-        try {
-            driverService.createDriver(request);
-            redirectAttributes.addFlashAttribute("successMessage", "Tạo hồ sơ tài xế thành công.");
-            return "redirect:/admin/drivers";
-        } catch (IllegalArgumentException ex) {
-            populateCreateFormModel(model);
-            model.addAttribute("errorMessage", ex.getMessage());
-            return "driver/create";
-        }
     }
 
     @GetMapping("/{id}/edit")
@@ -119,29 +85,6 @@ public class DriverController {
             model.addAttribute("errorMessage", ex.getMessage());
             return "driver/edit";
         }
-    }
-
-    @PostMapping("/{id}/toggle-status")
-    public String toggleDriverStatus(@PathVariable Long id,
-                                     RedirectAttributes redirectAttributes) {
-        try {
-            boolean active = driverService.toggleDriverStatus(id);
-            redirectAttributes.addFlashAttribute(
-                    "successMessage",
-                    active
-                            ? "Đã bật trạng thái hoạt động cho tài xế."
-                            : "Đã tắt trạng thái hoạt động của tài xế."
-            );
-        } catch (IllegalArgumentException ex) {
-            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
-        }
-
-        return "redirect:/admin/drivers";
-    }
-
-    private void populateCreateFormModel(Model model) {
-        model.addAttribute("pageTitle", "Tạo tài xế");
-        model.addAttribute("availableDriverAccounts", driverService.getAvailableDriverAccounts());
     }
 
     private void populateEditFormModel(Model model, Long driverId) {

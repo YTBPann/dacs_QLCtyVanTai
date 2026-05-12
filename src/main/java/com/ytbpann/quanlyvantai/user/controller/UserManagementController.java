@@ -30,7 +30,9 @@ public class UserManagementController {
 
     @GetMapping("/create")
     public String showCreateForm(Model model) {
-        model.addAttribute("userCreateRequest", new UserCreateRequest());
+        if (!model.containsAttribute("userCreateRequest")) {
+            model.addAttribute("userCreateRequest", new UserCreateRequest());
+        }
         model.addAttribute("roles", List.of(RoleName.MANAGER, RoleName.DRIVER));
         return "user/create";
     }
@@ -50,9 +52,8 @@ public class UserManagementController {
         try {
             userManagementService.createUser(request);
         } catch (IllegalArgumentException e) {
-            model.addAttribute("roles", List.of(RoleName.MANAGER, RoleName.DRIVER));
-
             String message = e.getMessage();
+
             if ("Username đã tồn tại".equals(message)) {
                 bindingResult.rejectValue("username", "duplicate", message);
             } else if ("Họ và tên không được để trống".equals(message)) {
@@ -61,6 +62,14 @@ public class UserManagementController {
                 bindingResult.rejectValue("password", "required", message);
             } else if ("Bạn phải chọn role".equals(message)) {
                 bindingResult.rejectValue("role", "required", message);
+            } else if ("Mã tài xế không được để trống".equals(message)) {
+                bindingResult.rejectValue("driverCode", "required", message);
+            } else if ("Số GPLX không được để trống".equals(message)) {
+                bindingResult.rejectValue("licenseNumber", "required", message);
+            } else if ("Mã tài xế đã tồn tại".equals(message)) {
+                bindingResult.rejectValue("driverCode", "duplicate", message);
+            } else if ("Số GPLX đã tồn tại".equals(message)) {
+                bindingResult.rejectValue("licenseNumber", "duplicate", message);
             } else {
                 model.addAttribute("errorMessage", message);
             }
