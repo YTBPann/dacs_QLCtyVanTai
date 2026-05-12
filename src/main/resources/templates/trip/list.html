@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý chuyến</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            background: #1e293b;
+            color: white;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header a {
+            color: #e5e7eb;
+            text-decoration: none;
+            margin-left: 16px;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 28px auto;
+            padding: 0 20px;
+        }
+
+        .page-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+
+        .page-top h2 {
+            margin: 0;
+            color: #0f172a;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: none;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #64748b;
+            color: white;
+        }
+
+        .btn-small {
+            padding: 6px 9px;
+            font-size: 13px;
+        }
+
+        .alert {
+            padding: 12px 14px;
+            border-radius: 6px;
+            margin-bottom: 14px;
+        }
+
+        .alert-success {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #86efac;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+
+        .table-wrap {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.08);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            min-width: 1180px;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        th, td {
+            border-bottom: 1px solid #e5e7eb;
+            padding: 10px 12px;
+            vertical-align: middle;
+            word-wrap: break-word;
+        }
+
+        th {
+            background: #f8fafc;
+            color: #334155;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        td {
+            color: #1e293b;
+            font-size: 14px;
+        }
+
+        .col-stt {
+            width: 54px;
+            text-align: center;
+        }
+
+        .col-code {
+            width: 110px;
+            font-weight: 700;
+        }
+
+        .col-driver {
+            width: 150px;
+        }
+
+        .col-vehicle {
+            width: 140px;
+        }
+
+        .col-route {
+            width: 220px;
+        }
+
+        .col-time {
+            width: 170px;
+        }
+
+        .col-status {
+            width: 135px;
+            text-align: center;
+        }
+
+        .col-notes {
+            width: 220px;
+        }
+
+        .col-actions {
+            width: 170px;
+            text-align: center;
+        }
+
+        .route-line {
+            margin-bottom: 4px;
+        }
+
+        .route-label {
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        .time-line {
+            margin-bottom: 4px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .badge-planned {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .badge-in-progress {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-completed {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .badge-cancelled {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-form {
+            margin-top: 8px;
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+        }
+
+        .status-form select {
+            max-width: 115px;
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid #cbd5e1;
+            font-size: 12px;
+        }
+
+        .empty {
+            text-align: center;
+            color: #64748b;
+            padding: 22px;
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <div>
+        <strong>Quản lý vận tải</strong>
+    </div>
+    <div>
+        <a th:href="@{/dashboard}">Dashboard</a>
+        <a th:href="@{/logout}">Đăng xuất</a>
+    </div>
+</div>
+
+<div class="container">
+    <div class="page-top">
+        <h2>Quản lý chuyến vận chuyển</h2>
+        <a class="btn btn-primary" th:href="@{/admin/trips/create}">+ Tạo chuyến</a>
+    </div>
+
+    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+            <tr>
+                <th class="col-stt">STT</th>
+                <th class="col-code">Mã chuyến</th>
+                <th class="col-driver">Tài xế</th>
+                <th class="col-vehicle">Xe</th>
+                <th class="col-route">Tuyến đường</th>
+                <th class="col-time">Thời gian dự kiến</th>
+                <th class="col-status">Trạng thái</th>
+                <th class="col-notes">Ghi chú</th>
+                <th class="col-actions">Thao tác</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:if="${#lists.isEmpty(trips)}">
+                <td colspan="9" class="empty">Chưa có chuyến nào.</td>
+            </tr>
+
+            <tr th:each="trip, iter : ${trips}">
+                <td class="col-stt" th:text="${iter.count}">1</td>
+
+                <td class="col-code" th:text="${trip.tripCode}">TRIP001</td>
+
+                <td class="col-driver">
+                    <div th:text="${trip.driver.fullName != null && !#strings.isEmpty(trip.driver.fullName) ? trip.driver.fullName : trip.driver.username}">
+                        Nguyễn Văn A
+                    </div>
+                    <small th:text="${trip.driver.username}">driver01</small>
+                </td>
+
+                <td class="col-vehicle">
+                    <div th:text="${trip.vehicle.licensePlate}">51A-12345</div>
+                    <small th:text="${trip.vehicle.vehicleType}">Xe tải</small>
+                </td>
+
+                <td class="col-route">
+                    <div class="route-line">
+                        <span class="route-label">Đi:</span>
+                        <span th:text="${trip.departurePoint}">TP.HCM</span>
+                    </div>
+                    <div class="route-line">
+                        <span class="route-label">Đến:</span>
+                        <span th:text="${trip.destinationPoint}">Cần Thơ</span>
+                    </div>
+                </td>
+
+                <td class="col-time">
+                    <div class="time-line">
+                        <span class="route-label">Bắt đầu:</span>
+                        <span th:text="${#temporals.format(trip.plannedStartTime, 'dd/MM/yyyy HH:mm')}">12/05/2026 08:00</span>
+                    </div>
+                    <div class="time-line">
+                        <span class="route-label">Kết thúc:</span>
+                        <span th:text="${#temporals.format(trip.plannedEndTime, 'dd/MM/yyyy HH:mm')}">12/05/2026 18:00</span>
+                    </div>
+                </td>
+
+                <td class="col-status">
+                    <span class="badge"
+                          th:classappend="${trip.status.name() == 'PLANNED'} ? ' badge-planned' :
+                                          (${trip.status.name() == 'IN_PROGRESS'} ? ' badge-in-progress' :
+                                          (${trip.status.name() == 'COMPLETED'} ? ' badge-completed' : ' badge-cancelled'))"
+                          th:text="${trip.status}">
+                        PLANNED
+                    </span>
+
+                    <form class="status-form"
+                          th:action="@{/admin/trips/{id}/status(id=${trip.id})}"
+                          method="post">
+                        <select name="status">
+                            <option th:each="status : ${statuses}"
+                                    th:value="${status}"
+                                    th:text="${status}"
+                                    th:selected="${status == trip.status}">
+                            </option>
+                        </select>
+                        <button type="submit" class="btn btn-secondary btn-small">Lưu</button>
+                    </form>
+                </td>
+
+                <td class="col-notes" th:text="${trip.notes != null && !#strings.isEmpty(trip.notes) ? trip.notes : '-'}">-</td>
+
+                <td class="col-actions">
+                    <a class="btn btn-primary btn-small"
+                       th:href="@{/admin/trips/{id}/edit(id=${trip.id})}">
+                        Sửa
+                    </a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>
