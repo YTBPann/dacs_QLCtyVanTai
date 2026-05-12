@@ -123,6 +123,8 @@ public class TripController {
         model.addAttribute("statuses", TripStatus.values());
         model.addAttribute("drivers", tripService.findAvailableDriversForCreate());
         model.addAttribute("vehicles", tripService.findAvailableVehiclesForCreate());
+        model.addAttribute("pickupLocations", tripService.findActivePickupLocations());
+        model.addAttribute("deliveryLocations", tripService.findActiveDeliveryLocations());
     }
 
     private void addFormAttributesForEdit(Model model, Long tripId) {
@@ -133,5 +135,7 @@ public class TripController {
         model.addAttribute("statuses", TripStatus.values());
         model.addAttribute("drivers", tripService.findAvailableDriversForEdit(tripId));
         model.addAttribute("vehicles", tripService.findAvailableVehiclesForEdit(tripId));
+        model.addAttribute("pickupLocations", tripService.findActivePickupLocations());
+        model.addAttribute("deliveryLocations", tripService.findActiveDeliveryLocations());
     }
 }

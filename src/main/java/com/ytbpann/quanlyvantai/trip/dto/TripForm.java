@@ -2,7 +2,6 @@ package com.ytbpann.quanlyvantai.trip.dto;
 
 import com.ytbpann.quanlyvantai.trip.entity.TripStatus;
 import jakarta.validation.constraints.FutureOrPresent;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -11,7 +10,14 @@ import java.time.LocalDateTime;
 
 public class TripForm {
 
-    @NotBlank(message = "Mã chuyến không được để trống")
+    /*
+     * Phase 2:
+     * Mã chuyến sẽ được tự sinh theo dạng:
+     * pickupCode-deliveryCode-yyyyMMdd-sequence
+     *
+     * Vì vậy không còn bắt buộc nhập mã chuyến từ form nữa.
+     * Field này vẫn giữ lại để hiển thị khi sửa chuyến hoặc tương thích dữ liệu cũ.
+     */
     @Size(max = 50, message = "Mã chuyến không được vượt quá 50 ký tự")
     private String tripCode;
 
@@ -21,11 +27,19 @@ public class TripForm {
     @NotNull(message = "Vui lòng chọn xe")
     private Long vehicleId;
 
-    @NotBlank(message = "Điểm đi không được để trống")
+    @NotNull(message = "Vui lòng chọn điểm lấy hàng")
+    private Long pickupLocationId;
+
+    @NotNull(message = "Vui lòng chọn điểm giao hàng")
+    private Long deliveryLocationId;
+
+    /*
+     * Giữ lại 2 field cũ để không phá dữ liệu Trip Phase 1.
+     * Sang Phase 2, service sẽ tự điền từ LocationPoint.
+     */
     @Size(max = 255, message = "Điểm đi không được vượt quá 255 ký tự")
     private String departurePoint;
 
-    @NotBlank(message = "Điểm đến không được để trống")
     @Size(max = 255, message = "Điểm đến không được vượt quá 255 ký tự")
     private String destinationPoint;
 
@@ -66,6 +80,22 @@ public class TripForm {
 
     public void setVehicleId(Long vehicleId) {
         this.vehicleId = vehicleId;
+    }
+
+    public Long getPickupLocationId() {
+        return pickupLocationId;
+    }
+
+    public void setPickupLocationId(Long pickupLocationId) {
+        this.pickupLocationId = pickupLocationId;
+    }
+
+    public Long getDeliveryLocationId() {
+        return deliveryLocationId;
+    }
+
+    public void setDeliveryLocationId(Long deliveryLocationId) {
+        this.deliveryLocationId = deliveryLocationId;
     }
 
     public String getDeparturePoint() {

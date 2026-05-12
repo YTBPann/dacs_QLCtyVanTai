@@ -1,5 +1,6 @@
 package com.ytbpann.quanlyvantai.trip.entity;
 
+import com.ytbpann.quanlyvantai.location.entity.LocationPoint;
 import com.ytbpann.quanlyvantai.user.entity.UserAccount;
 import com.ytbpann.quanlyvantai.vehicle.entity.Vehicle;
 import jakarta.persistence.*;
@@ -30,11 +31,24 @@ public class Trip {
     @JoinColumn(name = "vehicle_id", nullable = false)
     private Vehicle vehicle;
 
+    /*
+     * Giữ lại 2 field text cũ để không mất dữ liệu Trip Phase 1.
+     * Sang Phase 2, khi tạo/sửa Trip bằng Location, service sẽ tự điền text
+     * từ pickupLocation và deliveryLocation để tránh lỗi NOT NULL trong database.
+     */
     @Column(name = "departure_point", nullable = false, length = 255)
     private String departurePoint;
 
     @Column(name = "destination_point", nullable = false, length = 255)
     private String destinationPoint;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "pickup_location_id")
+    private LocationPoint pickupLocation;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "delivery_location_id")
+    private LocationPoint deliveryLocation;
 
     @Column(name = "planned_start_time", nullable = false)
     private LocalDateTime plannedStartTime;
@@ -94,6 +108,22 @@ public class Trip {
 
     public void setDestinationPoint(String destinationPoint) {
         this.destinationPoint = destinationPoint;
+    }
+
+    public LocationPoint getPickupLocation() {
+        return pickupLocation;
+    }
+
+    public void setPickupLocation(LocationPoint pickupLocation) {
+        this.pickupLocation = pickupLocation;
+    }
+
+    public LocationPoint getDeliveryLocation() {
+        return deliveryLocation;
+    }
+
+    public void setDeliveryLocation(LocationPoint deliveryLocation) {
+        this.deliveryLocation = deliveryLocation;
     }
 
     public LocalDateTime getPlannedStartTime() {

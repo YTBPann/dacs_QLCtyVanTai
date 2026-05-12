@@ -1,5 +1,9 @@
 package com.ytbpann.quanlyvantai.trip.service;
 
+import com.ytbpann.quanlyvantai.location.entity.LocationPoint;
+import com.ytbpann.quanlyvantai.location.entity.LocationType;
+import com.ytbpann.quanlyvantai.location.repository.LocationPointRepository;
+import com.ytbpann.quanlyvantai.location.service.LocationManagementService;
 import com.ytbpann.quanlyvantai.trip.dto.TripForm;
 import com.ytbpann.quanlyvantai.trip.entity.Trip;
 import com.ytbpann.quanlyvantai.trip.entity.TripStatus;
@@ -12,24 +16,35 @@ import com.ytbpann.quanlyvantai.vehicle.repository.VehicleRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @Transactional
 public class TripService {
 
+    private static final DateTimeFormatter TRIP_CODE_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
+
     private final TripRepository tripRepository;
     private final UserAccountRepository userAccountRepository;
     private final VehicleRepository vehicleRepository;
+    private final LocationPointRepository locationPointRepository;
+    private final LocationManagementService locationManagementService;
 
     public TripService(
             TripRepository tripRepository,
             UserAccountRepository userAccountRepository,
-            VehicleRepository vehicleRepository
+            VehicleRepository vehicleRepository,
+            LocationPointRepository locationPointRepository,
+            LocationManagementService locationManagementService
     ) {
         this.tripRepository = tripRepository;
         this.userAccountRepository = userAccountRepository;
         this.vehicleRepository = vehicleRepository;
+        this.locationPointRepository = locationPointRepository;
+        this.locationManagementService = locationManagementService;
     }
 
     @Transactional(readOnly = true)
@@ -63,17 +78,29 @@ public class TripService {
         return vehicleRepository.findByActiveTrueOrderByLicensePlateAsc();
     }
 
+    @Transactional(readOnly = true)
+    public List<LocationPoint> findActivePickupLocations() {
+        return locationManagementService.findActivePickupLocations();
+    }
+
+    @Transactional(readOnly = true)
+    public List<LocationPoint> findActiveDeliveryLocations() {
+        return locationManagementService.findActiveDeliveryLocations();
+    }
+
     public Trip createTrip(TripForm form) {
-        validateTripCodeForCreate(form.getTripCode());
         validateTimeRange(form);
 
         UserAccount driver = findActiveDriver(form.getDriverId());
         Vehicle vehicle = findActiveVehicle(form.getVehicleId());
+        LocationPoint pickupLocation = findActivePickupLocation(form.getPickupLocationId());
+        LocationPoint deliveryLocation = findActiveDeliveryLocation(form.getDeliveryLocationId());
 
         TripStatus status = form.getStatus() == null ? TripStatus.PLANNED : form.getStatus();
+        String tripCode = generateTripCode(pickupLocation, deliveryLocation, form.getPlannedStartTime());
 
         Trip trip = new Trip();
-        applyFormToTrip(trip, form, driver, vehicle, status);
+        applyFormToTrip(trip, form, driver, vehicle, pickupLocation, deliveryLocation, status, tripCode);
 
         return tripRepository.save(trip);
     }
@@ -81,15 +108,17 @@ public class TripService {
     public Trip updateTrip(Long id, TripForm form) {
         Trip trip = findById(id);
 
-        validateTripCodeForUpdate(form.getTripCode(), id);
         validateTimeRange(form);
 
         UserAccount driver = findActiveDriver(form.getDriverId());
         Vehicle vehicle = findActiveVehicle(form.getVehicleId());
+        LocationPoint pickupLocation = findActivePickupLocation(form.getPickupLocationId());
+        LocationPoint deliveryLocation = findActiveDeliveryLocation(form.getDeliveryLocationId());
 
         TripStatus status = form.getStatus() == null ? TripStatus.PLANNED : form.getStatus();
+        String tripCode = resolveTripCodeForUpdate(trip, pickupLocation, deliveryLocation, form);
 
-        applyFormToTrip(trip, form, driver, vehicle, status);
+        applyFormToTrip(trip, form, driver, vehicle, pickupLocation, deliveryLocation, status, tripCode);
 
         return tripRepository.save(trip);
     }
@@ -111,6 +140,15 @@ public class TripService {
         form.setTripCode(trip.getTripCode());
         form.setDriverId(trip.getDriver().getId());
         form.setVehicleId(trip.getVehicle().getId());
+
+        if (trip.getPickupLocation() != null) {
+            form.setPickupLocationId(trip.getPickupLocation().getId());
+        }
+
+        if (trip.getDeliveryLocation() != null) {
+            form.setDeliveryLocationId(trip.getDeliveryLocation().getId());
+        }
+
         form.setDeparturePoint(trip.getDeparturePoint());
         form.setDestinationPoint(trip.getDestinationPoint());
         form.setPlannedStartTime(trip.getPlannedStartTime());
@@ -126,13 +164,27 @@ public class TripService {
             TripForm form,
             UserAccount driver,
             Vehicle vehicle,
-            TripStatus status
+            LocationPoint pickupLocation,
+            LocationPoint deliveryLocation,
+            TripStatus status,
+            String tripCode
     ) {
-        trip.setTripCode(normalizeText(form.getTripCode()));
+        trip.setTripCode(normalizeText(tripCode));
         trip.setDriver(driver);
         trip.setVehicle(vehicle);
-        trip.setDeparturePoint(normalizeText(form.getDeparturePoint()));
-        trip.setDestinationPoint(normalizeText(form.getDestinationPoint()));
+
+        trip.setPickupLocation(pickupLocation);
+        trip.setDeliveryLocation(deliveryLocation);
+
+        /*
+         * Vẫn điền 2 cột text cũ để:
+         * - không lỗi NOT NULL trong database cũ
+         * - dữ liệu Trip Phase 1 không bị phá
+         * - template/list cũ vẫn còn fallback được nếu cần
+         */
+        trip.setDeparturePoint(buildLocationDisplayName(pickupLocation));
+        trip.setDestinationPoint(buildLocationDisplayName(deliveryLocation));
+
         trip.setPlannedStartTime(form.getPlannedStartTime());
         trip.setPlannedEndTime(form.getPlannedEndTime());
         trip.setStatus(status);
@@ -165,20 +217,153 @@ public class TripService {
         return vehicle;
     }
 
-    private void validateTripCodeForCreate(String tripCode) {
-        String normalizedTripCode = normalizeText(tripCode);
+    private LocationPoint findActivePickupLocation(Long locationId) {
+        LocationPoint location = findActiveLocation(locationId, "điểm lấy hàng");
 
-        if (tripRepository.existsByTripCodeIgnoreCase(normalizedTripCode)) {
-            throw new IllegalArgumentException("Mã chuyến đã tồn tại");
+        if (!isPickupLocationType(location.getType())) {
+            throw new IllegalArgumentException("Địa điểm được chọn không phải điểm lấy hàng hợp lệ");
+        }
+
+        return location;
+    }
+
+    private LocationPoint findActiveDeliveryLocation(Long locationId) {
+        LocationPoint location = findActiveLocation(locationId, "điểm giao hàng");
+
+        if (!isDeliveryLocationType(location.getType())) {
+            throw new IllegalArgumentException("Địa điểm được chọn không phải điểm giao hàng hợp lệ");
+        }
+
+        return location;
+    }
+
+    private LocationPoint findActiveLocation(Long locationId, String label) {
+        if (locationId == null) {
+            throw new IllegalArgumentException("Vui lòng chọn " + label);
+        }
+
+        LocationPoint location = locationPointRepository.findById(locationId)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy " + label));
+
+        if (!location.isActive()) {
+            throw new IllegalArgumentException("Địa điểm được chọn đang bị tắt");
+        }
+
+        if (location.getType() == null) {
+            throw new IllegalArgumentException("Địa điểm được chọn chưa có loại hợp lệ");
+        }
+
+        return location;
+    }
+
+    private boolean isPickupLocationType(LocationType type) {
+        return type == LocationType.PICKUP_POINT || type == LocationType.BOTH;
+    }
+
+    private boolean isDeliveryLocationType(LocationType type) {
+        return type == LocationType.DELIVERY_POINT || type == LocationType.BOTH;
+    }
+
+    private String resolveTripCodeForUpdate(
+            Trip trip,
+            LocationPoint pickupLocation,
+            LocationPoint deliveryLocation,
+            TripForm form
+    ) {
+        if (isBlank(trip.getTripCode())) {
+            return generateTripCode(pickupLocation, deliveryLocation, form.getPlannedStartTime());
+        }
+
+        if (shouldRegenerateTripCode(trip, pickupLocation, deliveryLocation, form)) {
+            return generateTripCode(pickupLocation, deliveryLocation, form.getPlannedStartTime());
+        }
+
+        return trip.getTripCode();
+    }
+
+    private boolean shouldRegenerateTripCode(
+            Trip trip,
+            LocationPoint pickupLocation,
+            LocationPoint deliveryLocation,
+            TripForm form
+    ) {
+        Long oldPickupId = trip.getPickupLocation() == null ? null : trip.getPickupLocation().getId();
+        Long oldDeliveryId = trip.getDeliveryLocation() == null ? null : trip.getDeliveryLocation().getId();
+
+        Long newPickupId = pickupLocation == null ? null : pickupLocation.getId();
+        Long newDeliveryId = deliveryLocation == null ? null : deliveryLocation.getId();
+
+        LocalDate oldDate = trip.getPlannedStartTime() == null ? null : trip.getPlannedStartTime().toLocalDate();
+        LocalDate newDate = form.getPlannedStartTime() == null ? null : form.getPlannedStartTime().toLocalDate();
+
+        return !Objects.equals(oldPickupId, newPickupId)
+                || !Objects.equals(oldDeliveryId, newDeliveryId)
+                || !Objects.equals(oldDate, newDate);
+    }
+
+    private String generateTripCode(
+            LocationPoint pickupLocation,
+            LocationPoint deliveryLocation,
+            java.time.LocalDateTime plannedStartTime
+    ) {
+        String pickupCode = normalizeLocationCode(pickupLocation.getCode());
+        String deliveryCode = normalizeLocationCode(deliveryLocation.getCode());
+
+        LocalDate tripDate = plannedStartTime == null
+                ? LocalDate.now()
+                : plannedStartTime.toLocalDate();
+
+        String datePart = tripDate.format(TRIP_CODE_DATE_FORMATTER);
+        String prefix = pickupCode + "-" + deliveryCode + "-" + datePart + "-";
+
+        int nextSequence = tripRepository.findTopByTripCodeStartingWithOrderByTripCodeDesc(prefix)
+                .map(latestTrip -> extractSequence(latestTrip.getTripCode(), prefix))
+                .orElse(0) + 1;
+
+        return prefix + String.format("%03d", nextSequence);
+    }
+
+    private int extractSequence(String tripCode, String prefix) {
+        if (tripCode == null || !tripCode.startsWith(prefix)) {
+            return 0;
+        }
+
+        String sequenceText = tripCode.substring(prefix.length());
+
+        try {
+            return Integer.parseInt(sequenceText);
+        } catch (NumberFormatException ex) {
+            return 0;
         }
     }
 
-    private void validateTripCodeForUpdate(String tripCode, Long id) {
-        String normalizedTripCode = normalizeText(tripCode);
+    private String normalizeLocationCode(String code) {
+        String normalizedCode = normalizeText(code);
 
-        if (tripRepository.existsByTripCodeIgnoreCaseAndIdNot(normalizedTripCode, id)) {
-            throw new IllegalArgumentException("Mã chuyến đã tồn tại");
+        if (isBlank(normalizedCode)) {
+            throw new IllegalArgumentException("Mã địa điểm không hợp lệ, không thể tự sinh mã chuyến");
         }
+
+        return normalizedCode;
+    }
+
+    private String buildLocationDisplayName(LocationPoint location) {
+        String code = normalizeNullableText(location.getCode());
+        String name = normalizeNullableText(location.getName());
+
+        if (code == null && name == null) {
+            return "Không rõ địa điểm";
+        }
+
+        if (code == null) {
+            return name;
+        }
+
+        if (name == null) {
+            return code;
+        }
+
+        return code + " - " + name;
     }
 
     private void validateTimeRange(TripForm form) {
@@ -202,5 +387,9 @@ public class TripService {
 
         String trimmed = value.trim();
         return trimmed.isEmpty() ? null : trimmed;
+    }
+
+    private boolean isBlank(String value) {
+        return value == null || value.trim().isEmpty();
     }
 }

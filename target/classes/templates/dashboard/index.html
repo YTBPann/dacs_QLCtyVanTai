@@ -128,7 +128,8 @@
                 Quản lý chuyến
             </a>
 
-            <a class="card-link" 
+            <a class="action-link"
+               th:if="${role != null and role.toString() == 'ADMIN'}"
                th:href="@{/admin/locations}">
                Quản lý địa điểm
             </a>

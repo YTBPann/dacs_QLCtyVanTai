@@ -9,15 +9,18 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 public interface TripRepository extends JpaRepository<Trip, Long> {
 
-    @EntityGraph(attributePaths = {"driver", "vehicle"})
+    @EntityGraph(attributePaths = {"driver", "vehicle", "pickupLocation", "deliveryLocation"})
     List<Trip> findAllByOrderByIdAsc();
 
     boolean existsByTripCodeIgnoreCase(String tripCode);
 
     boolean existsByTripCodeIgnoreCaseAndIdNot(String tripCode, Long id);
+
+    Optional<Trip> findTopByTripCodeStartingWithOrderByTripCodeDesc(String prefix);
 
     boolean existsByDriverAndStatusIn(UserAccount driver, Collection<TripStatus> statuses);
 

@@ -27,7 +27,7 @@
         }
 
         .container {
-            max-width: 820px;
+            max-width: 900px;
             margin: 28px auto;
             padding: 0 20px;
         }
@@ -74,6 +74,11 @@
             font-size: 14px;
         }
 
+        input[readonly] {
+            background: #f8fafc;
+            color: #475569;
+        }
+
         textarea {
             resize: vertical;
             min-height: 100px;
@@ -103,6 +108,16 @@
             margin-bottom: 16px;
         }
 
+        .info-box {
+            background: #eff6ff;
+            color: #1e40af;
+            border: 1px solid #bfdbfe;
+            padding: 12px 14px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
         .actions {
             display: flex;
             gap: 10px;
@@ -124,9 +139,17 @@
             color: white;
         }
 
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+
         .btn-secondary {
             background: #64748b;
             color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #475569;
         }
 
         small {
@@ -153,9 +176,9 @@
     </div>
     <div>
         <a class="action-link"
-            th:if="${role != null and role.toString() == 'ADMIN'}"
-            th:href="@{/admin/trips}">
-                Quản lý chuyến
+           th:if="${role != null and role.toString() == 'ADMIN'}"
+           th:href="@{/admin/trips}">
+            Quản lý chuyến
         </a>
         <a th:href="@{/dashboard}">Dashboard</a>
         <a th:href="@{/logout}">Đăng xuất</a>
@@ -166,12 +189,27 @@
     <div class="card">
         <h2 th:text="${formTitle}">Tạo chuyến mới</h2>
 
+        <div th:if="${mode == 'create'}" class="info-box">
+            Mã chuyến sẽ được tự sinh sau khi lưu theo dạng:
+            <strong>mã điểm lấy - mã điểm giao - ngày - số thứ tự</strong>.
+            <br>
+            Ví dụ: <strong>001-101-20260512-001</strong>
+        </div>
+
         <div th:if="${#lists.isEmpty(drivers)}" class="warning">
             Hiện không có tài xế khả dụng. Tài xế phải là DRIVER và đang được bật đăng nhập.
         </div>
 
         <div th:if="${#lists.isEmpty(vehicles)}" class="warning">
             Hiện không có xe khả dụng. Xe phải đang được bật hoạt động.
+        </div>
+
+        <div th:if="${#lists.isEmpty(pickupLocations)}" class="warning">
+            Hiện không có điểm lấy hàng khả dụng. Địa điểm phải đang bật và có loại PICKUP_POINT hoặc BOTH.
+        </div>
+
+        <div th:if="${#lists.isEmpty(deliveryLocations)}" class="warning">
+            Hiện không có điểm giao hàng khả dụng. Địa điểm phải đang bật và có loại DELIVERY_POINT hoặc BOTH.
         </div>
 
         <form th:object="${tripForm}"
@@ -183,13 +221,16 @@
             </div>
 
             <div class="form-grid">
-                <div class="form-group">
+                <div class="form-group" th:if="${mode == 'edit'}">
                     <label for="tripCode">Mã chuyến</label>
-                    <input id="tripCode" type="text" th:field="*{tripCode}" placeholder="VD: TRIP001">
+                    <input id="tripCode" type="text" th:field="*{tripCode}" readonly>
+                    <small>
+                        Mã chuyến sẽ tự đổi nếu thay điểm lấy, điểm giao hoặc ngày bắt đầu.
+                    </small>
                     <div class="error" th:if="${#fields.hasErrors('tripCode')}" th:errors="*{tripCode}"></div>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" th:classappend="${mode == 'create'} ? 'full' : ''">
                     <label for="status">Trạng thái</label>
                     <select id="status" th:field="*{status}">
                         <option th:each="status : ${statuses}"
@@ -225,15 +266,27 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="departurePoint">Điểm lấy hàng</label>
-                    <input id="departurePoint" type="text" th:field="*{departurePoint}" placeholder="VD: Kho TP.HCM">
-                    <div class="error" th:if="${#fields.hasErrors('departurePoint')}" th:errors="*{departurePoint}"></div>
+                    <label for="pickupLocationId">Điểm lấy hàng</label>
+                    <select id="pickupLocationId" th:field="*{pickupLocationId}">
+                        <option value="">-- Chọn điểm lấy hàng --</option>
+                        <option th:each="location : ${pickupLocations}"
+                                th:value="${location.id}"
+                                th:text="${location.code + ' - ' + location.name}">
+                        </option>
+                    </select>
+                    <div class="error" th:if="${#fields.hasErrors('pickupLocationId')}" th:errors="*{pickupLocationId}"></div>
                 </div>
 
                 <div class="form-group">
-                    <label for="destinationPoint">Điểm giao hàng</label>
-                    <input id="destinationPoint" type="text" th:field="*{destinationPoint}" placeholder="VD: Kho Cần Thơ">
-                    <div class="error" th:if="${#fields.hasErrors('destinationPoint')}" th:errors="*{destinationPoint}"></div>
+                    <label for="deliveryLocationId">Điểm giao hàng</label>
+                    <select id="deliveryLocationId" th:field="*{deliveryLocationId}">
+                        <option value="">-- Chọn điểm giao hàng --</option>
+                        <option th:each="location : ${deliveryLocations}"
+                                th:value="${location.id}"
+                                th:text="${location.code + ' - ' + location.name}">
+                        </option>
+                    </select>
+                    <div class="error" th:if="${#fields.hasErrors('deliveryLocationId')}" th:errors="*{deliveryLocationId}"></div>
                 </div>
 
                 <div class="form-group">
@@ -257,7 +310,10 @@
             </div>
 
             <div class="actions">
-                <button type="submit" class="btn btn-primary">Lưu</button>
+                <button type="submit" class="btn btn-primary"
+                        th:disabled="${#lists.isEmpty(drivers) or #lists.isEmpty(vehicles) or #lists.isEmpty(pickupLocations) or #lists.isEmpty(deliveryLocations)}">
+                    Lưu
+                </button>
                 <a class="btn btn-secondary" th:href="@{/admin/trips}">Quay lại</a>
             </div>
         </form>
