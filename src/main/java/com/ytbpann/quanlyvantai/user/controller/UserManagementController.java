@@ -50,7 +50,21 @@ public class UserManagementController {
         try {
             userManagementService.createUser(request);
         } catch (IllegalArgumentException e) {
-            bindingResult.rejectValue("username", "duplicate", e.getMessage());
+            model.addAttribute("roles", List.of(RoleName.MANAGER, RoleName.DRIVER));
+
+            String message = e.getMessage();
+            if ("Username đã tồn tại".equals(message)) {
+                bindingResult.rejectValue("username", "duplicate", message);
+            } else if ("Họ và tên không được để trống".equals(message)) {
+                bindingResult.rejectValue("fullName", "required", message);
+            } else if ("Password không được để trống".equals(message)) {
+                bindingResult.rejectValue("password", "required", message);
+            } else if ("Bạn phải chọn role".equals(message)) {
+                bindingResult.rejectValue("role", "required", message);
+            } else {
+                model.addAttribute("errorMessage", message);
+            }
+
             return "user/create";
         }
 

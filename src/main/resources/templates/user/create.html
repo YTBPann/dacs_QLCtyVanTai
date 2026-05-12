@@ -46,21 +46,6 @@
     </div>
 
     <br>
-    
-    <div style="margin-bottom: 10px;">
-        <label for="linkedUserAccountId">Tài khoản DRIVER liên kết</label><br>
-        <select id="linkedUserAccountId" th:field="*{linkedUserAccountId}">
-            <option value="">-- Chưa liên kết tài khoản --</option>
-            <option th:each="account : ${availableDriverAccounts}"
-                    th:value="${account.id}"
-                    th:text="${account.username + ' - ' + account.fullName}">
-            </option>
-        </select>
-
-        <div th:if="${#lists.isEmpty(availableDriverAccounts)}" style="color: #666; margin-top: 4px;">
-            Hiện chưa có tài khoản DRIVER khả dụng để liên kết.
-        </div>
-    </div>
 
     <button type="submit">Tạo tài khoản</button>
 </form>

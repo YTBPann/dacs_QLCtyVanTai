@@ -27,8 +27,25 @@ public class UserManagementService {
     }
 
     public void createUser(UserCreateRequest request) {
-        String username = request.getUsername().trim();
-        String fullName = request.getFullName().trim();
+        String username = safeTrim(request.getUsername());
+        String fullName = safeTrim(request.getFullName());
+        String password = request.getPassword();
+
+        if (username == null || username.isBlank()) {
+            throw new IllegalArgumentException("Username không được để trống");
+        }
+
+        if (fullName == null || fullName.isBlank()) {
+            throw new IllegalArgumentException("Họ và tên không được để trống");
+        }
+
+        if (password == null || password.isBlank()) {
+            throw new IllegalArgumentException("Password không được để trống");
+        }
+
+        if (request.getRole() == null) {
+            throw new IllegalArgumentException("Bạn phải chọn role");
+        }
 
         if (userAccountRepository.existsByUsername(username)) {
             throw new IllegalArgumentException("Username đã tồn tại");
@@ -36,12 +53,16 @@ public class UserManagementService {
 
         UserAccount user = new UserAccount();
         user.setUsername(username);
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setPassword(passwordEncoder.encode(password));
         user.setFullName(fullName);
         user.setRole(request.getRole());
         user.setEnabled(true);
 
         userAccountRepository.save(user);
+    }
+
+    private String safeTrim(String value) {
+        return value == null ? null : value.trim();
     }
 
     public void changeUserStatus(Long userId, boolean enabled) {

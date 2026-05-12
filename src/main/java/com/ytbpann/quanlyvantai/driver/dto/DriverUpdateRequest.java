@@ -4,7 +4,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 
-public class DriverCreateRequest {
+public class DriverUpdateRequest {
 
     private String driverCode;
     private String fullName;
@@ -19,7 +19,7 @@ public class DriverCreateRequest {
     private boolean active = true;
     private Long linkedUserAccountId;
 
-    public DriverCreateRequest() {
+    public DriverUpdateRequest() {
     }
 
     public String getDriverCode() {
