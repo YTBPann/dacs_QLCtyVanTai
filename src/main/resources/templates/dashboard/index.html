@@ -96,12 +96,26 @@
         <p>Vai trò: <b th:text="${role}">ADMIN</b></p>
 
         <div class="actions">
-            <a class="action-link" th:href="@{/account/change-password}">Đổi mật khẩu</a>
+            <a class="action-link" th:href="@{/account/change-password}">
+                Đổi mật khẩu
+            </a>
 
             <a class="action-link"
                th:if="${role != null and role.toString() == 'ADMIN'}"
                th:href="@{/users}">
                 Quản lý tài khoản người dùng
+            </a>
+
+            <a class="action-link"
+               th:if="${role != null and role.toString() == 'ADMIN'}"
+               th:href="@{/admin/drivers}">
+                Quản lý hồ sơ tài xế
+            </a>
+
+            <a class="action-link"
+               th:if="${role != null and role.toString() == 'ADMIN'}"
+               th:href="@{/admin/vehicles}">
+                Quản lý xe
             </a>
         </div>
 

@@ -10,6 +10,11 @@ N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\driver\entity\Driver
 N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\driver\repository\DriverProfileRepository.java
 N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\driver\service\DriverService.java
 N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\QuanlyvantaiApplication.java
+N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\trip\dto\TripForm.java
+N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\trip\entity\Trip.java
+N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\trip\entity\TripStatus.java
+N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\trip\repository\TripRepository.java
+N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\trip\service\TripService.java
 N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\user\controller\UserAccountController.java
 N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\user\controller\UserManagementController.java
 N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\user\dto\UserChangePasswordRequest.java
@@ -20,3 +25,9 @@ N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\user\entity\RoleName
 N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\user\entity\UserAccount.java
 N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\user\repository\UserAccountRepository.java
 N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\user\service\UserManagementService.java
+N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\vehicle\controller\VehicleController.java
+N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\vehicle\dto\VehicleCreateRequest.java
+N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\vehicle\dto\VehicleUpdateRequest.java
+N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\vehicle\entity\Vehicle.java
+N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\vehicle\repository\VehicleRepository.java
+N:\DACS\quanlyvantai\src\main\java\com\ytbpann\quanlyvantai\vehicle\service\VehicleService.java

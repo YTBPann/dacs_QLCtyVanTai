@@ -16,4 +16,6 @@ public interface UserAccountRepository extends JpaRepository<UserAccount, Long> 
     boolean existsByUsernameAndIdNot(String username, Long id);
 
     List<UserAccount> findByRoleOrderByUsernameAsc(RoleName role);
+
+    List<UserAccount> findByRoleAndEnabledTrueOrderByFullNameAsc(RoleName role);
 }
