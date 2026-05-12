@@ -2,6 +2,7 @@ package com.ytbpann.quanlyvantai.location.service;
 
 import com.ytbpann.quanlyvantai.location.dto.LocationForm;
 import com.ytbpann.quanlyvantai.location.entity.LocationPoint;
+import com.ytbpann.quanlyvantai.location.entity.LocationType;
 import com.ytbpann.quanlyvantai.location.repository.LocationPointRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +21,25 @@ public class LocationManagementService {
     @Transactional(readOnly = true)
     public List<LocationPoint> findAll() {
         return locationPointRepository.findAllByOrderByActiveDescCodeAscNameAsc();
+    }
+
+    @Transactional(readOnly = true)
+    public List<LocationPoint> findAllActive() {
+        return locationPointRepository.findByActiveTrueOrderByCodeAscNameAsc();
+    }
+
+    @Transactional(readOnly = true)
+    public List<LocationPoint> findActivePickupLocations() {
+        return locationPointRepository.findByActiveTrueAndTypeInOrderByCodeAscNameAsc(
+                List.of(LocationType.PICKUP_POINT, LocationType.BOTH)
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public List<LocationPoint> findActiveDeliveryLocations() {
+        return locationPointRepository.findByActiveTrueAndTypeInOrderByCodeAscNameAsc(
+                List.of(LocationType.DELIVERY_POINT, LocationType.BOTH)
+        );
     }
 
     @Transactional(readOnly = true)
