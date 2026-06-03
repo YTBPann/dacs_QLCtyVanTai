@@ -2,67 +2,184 @@
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard - Quản lý vận tải</title>
+    <title>Trang chính - Quản lý vận tải</title>
+
+    <link rel="stylesheet"
+          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+        }
+
         body {
             font-family: Arial, sans-serif;
             background: #f4f7fb;
             margin: 0;
             padding: 0;
+            color: #0f172a;
         }
 
-        .header {
+        .app-header {
+            height: 68px;
             background: #1e293b;
             color: white;
-            padding: 16px 24px;
+            padding: 0 24px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.18);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
 
-        .container {
-            max-width: 1000px;
-            margin: 32px auto;
-            padding: 0 16px;
+        .header-left {
+            display: flex;
+            align-items: center;
+            min-width: 0;
         }
 
-        .card {
-            background: white;
-            padding: 24px;
-            border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.06);
-        }
-
-        .logout-form {
-            margin: 0;
-        }
-
-        .logout-btn {
-            background: #ef4444;
+        .home-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
             color: white;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 18px;
+            min-width: 0;
+        }
+
+        .home-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: #334155;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 25px;
+            flex-shrink: 0;
+        }
+
+        .system-name {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-menu {
+            position: relative;
+        }
+
+        .circle-btn {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
             border: none;
-            padding: 10px 14px;
-            border-radius: 8px;
+            background: #334155;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
             cursor: pointer;
         }
 
-        .actions {
-            margin: 20px 0;
+        .circle-btn:hover {
+            background: #475569;
         }
 
-        .action-link {
-            display: inline-block;
-            background: #2563eb;
+        .dropdown-panel {
+            display: none;
+            position: absolute;
+            top: 56px;
+            right: 0;
+            width: 310px;
+            background: #1f2937;
             color: white;
-            text-decoration: none;
-            padding: 10px 14px;
-            border-radius: 8px;
-            margin-right: 10px;
-            margin-bottom: 10px;
+            border-radius: 14px;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.32);
+            padding: 10px;
+            z-index: 2000;
         }
 
-        .action-link:hover {
-            background: #1d4ed8;
+        .dropdown-panel.show {
+            display: block;
+        }
+
+        .dropdown-title {
+            padding: 12px 12px 8px;
+            font-weight: 700;
+            font-size: 15px;
+            color: #e5e7eb;
+        }
+
+        .dropdown-user {
+            padding: 12px;
+            border-bottom: 1px solid #374151;
+            margin-bottom: 8px;
+        }
+
+        .dropdown-user-name {
+            font-weight: 700;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .dropdown-user-meta {
+            color: #cbd5e1;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .dropdown-item,
+        .dropdown-submit {
+            width: 100%;
+            min-height: 42px;
+            border: none;
+            background: transparent;
+            color: #e5e7eb;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            padding: 10px 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 15px;
+            text-align: left;
+            font-family: Arial, sans-serif;
+        }
+
+        .dropdown-item:hover,
+        .dropdown-submit:hover {
+            background: #374151;
+        }
+
+        .dropdown-submit.danger {
+            color: #fecaca;
+        }
+
+        .dropdown-form {
+            margin: 0;
+        }
+
+        .main-content {
+            min-height: calc(100vh - 68px);
+            padding: 18px 20px 20px;
         }
 
         .success-message {
@@ -70,83 +187,492 @@
             color: #166534;
             border: 1px solid #86efac;
             padding: 10px 14px;
-            border-radius: 8px;
-            margin: 16px 0;
+            border-radius: 10px;
+            margin-bottom: 14px;
         }
 
-        ul {
-            line-height: 1.8;
+        .map-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+            padding: 18px;
+            min-height: calc(100vh - 108px);
+        }
+
+        .map-toolbar {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 14px;
+        }
+
+        .map-title-block h1 {
+            font-size: 24px;
+            margin: 0 0 6px;
+        }
+
+        .map-title-block p {
+            margin: 0;
+            color: #64748b;
+            line-height: 1.5;
+        }
+
+        .btn {
+            display: inline-block;
+            background: #2563eb;
+            color: white;
+            border: none;
+            text-decoration: none;
+            padding: 10px 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 15px;
+            white-space: nowrap;
+        }
+
+        .btn:hover {
+            background: #1d4ed8;
+        }
+
+        #map {
+            width: 100%;
+            height: calc(100vh - 210px);
+            min-height: 520px;
+            border-radius: 14px;
+            border: 1px solid #cbd5e1;
+        }
+
+        .map-status {
+            color: #475569;
+            font-size: 14px;
+            margin: 12px 0 0;
+        }
+
+        .popup-title {
+            font-weight: 700;
+            font-size: 15px;
+            margin-bottom: 6px;
+        }
+
+        .popup-row {
+            margin: 3px 0;
+        }
+
+        .popup-label {
+            font-weight: 600;
+        }
+
+        .driver-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+            padding: 24px;
+            max-width: 760px;
+            margin: 40px auto;
+        }
+
+        .driver-card h1 {
+            margin-top: 0;
+        }
+
+        @media (max-width: 760px) {
+            .app-header {
+                padding: 0 14px;
+            }
+
+            .system-name {
+                max-width: 190px;
+            }
+
+            .dropdown-panel {
+                width: 280px;
+            }
+
+            .main-content {
+                padding: 12px;
+            }
+
+            .map-card {
+                padding: 12px;
+            }
+
+            .map-toolbar {
+                flex-direction: column;
+            }
+
+            #map {
+                height: calc(100vh - 245px);
+                min-height: 440px;
+            }
         }
     </style>
 </head>
 <body>
-<div class="header">
-    <div><b>Hệ thống quản lý vận tải</b></div>
-    <form class="logout-form" th:action="@{/logout}" method="post">
-        <button class="logout-btn" type="submit">Đăng xuất</button>
-    </form>
-</div>
-
-<div class="container">
-    <div class="card">
-        <h2>Dashboard</h2>
-
-        <div class="success-message" th:if="${successMessage}" th:text="${successMessage}">
-            Đổi mật khẩu thành công
-        </div>
-
-        <p>Xin chào, <b th:text="${fullName}">User</b></p>
-        <p>Tên đăng nhập: <b th:text="${username}">username</b></p>
-        <p>Vai trò: <b th:text="${role}">ADMIN</b></p>
-
-        <div class="actions">
-            <a class="action-link" th:href="@{/account/change-password}">
-                Đổi mật khẩu
-            </a>
-
-            <a class="action-link"
-               th:if="${role != null and role.toString() == 'ADMIN'}"
-               th:href="@{/users}">
-                Quản lý tài khoản người dùng
-            </a>
-
-            <a class="action-link"
-               th:if="${role != null and role.toString() == 'ADMIN'}"
-               th:href="@{/admin/drivers}">
-                Quản lý hồ sơ tài xế
-            </a>
-
-            <a class="action-link"
-               th:if="${role != null and role.toString() == 'ADMIN'}"
-               th:href="@{/admin/vehicles}">
-                Quản lý xe
-            </a>
-
-            <a class="action-link"
-               th:if="${role != null and role.toString() == 'ADMIN'}"
-               th:href="@{/admin/trips}">
-                Quản lý chuyến
-            </a>
-
-            <a class="action-link"
-               th:if="${role != null and role.toString() == 'ADMIN'}"
-               th:href="@{/admin/locations}">
-               Quản lý địa điểm
-            </a>
-
-        </div>
-
-        <hr>
-
-        <p>Khung nền auth đã hoạt động. Bước tiếp theo sẽ là:</p>
-        <ul>
-            <li>Quản lý tài khoản người dùng</li>
-            <li>Quản lý tài xế</li>
-            <li>Quản lý xe</li>
-            <li>Quản lý chuyến vận chuyển</li>
-            <li>Theo dõi GPS trên map</li>
-        </ul>
+<header class="app-header">
+    <div class="header-left">
+        <a class="home-link" th:href="@{/dashboard}">
+            <span class="home-icon">🏠</span>
+        </a>
     </div>
-</div>
+
+    <div class="header-right">
+        <div class="header-menu"
+             th:if="${role != null and (role.toString() == 'ADMIN' or role.toString() == 'MANAGER')}">
+            <button class="circle-btn" type="button" data-menu-button="managementMenu" title="Quản lý">
+                ▦
+            </button>
+
+            <div class="dropdown-panel" id="managementMenu">
+                <div class="dropdown-title">Quản lý hệ thống</div>
+
+                <a class="dropdown-item"
+                   th:if="${role != null and role.toString() == 'ADMIN'}"
+                   th:href="@{/users}">
+                    👥 Quản lý tài khoản người dùng
+                </a>
+
+                <a class="dropdown-item"
+                   th:href="@{/admin/drivers}">
+                    🪪 Quản lý hồ sơ tài xế
+                </a>
+
+                <a class="dropdown-item"
+                   th:href="@{/admin/vehicles}">
+                    🚚 Quản lý xe
+                </a>
+
+                <a class="dropdown-item"
+                   th:href="@{/admin/trips}">
+                    📦 Quản lý chuyến
+                </a>
+
+                <a class="dropdown-item"
+                   th:href="@{/admin/locations}">
+                    📍 Quản lý địa điểm
+                </a>
+            </div>
+        </div>
+
+        <div class="header-menu">
+            <button class="circle-btn" type="button" data-menu-button="profileMenu" title="Tài khoản">
+                👤
+            </button>
+
+            <div class="dropdown-panel" id="profileMenu">
+                <div class="dropdown-user">
+                    <div class="dropdown-user-name" th:text="${fullName}">System Administrator</div>
+                    <div class="dropdown-user-meta">
+                        Tên đăng nhập:
+                        <b th:text="${username}">admin</b>
+                    </div>
+                    <div class="dropdown-user-meta">
+                        Vai trò:
+                        <b th:text="${role}">ADMIN</b>
+                    </div>
+                </div>
+
+                <a class="dropdown-item" th:href="@{/account/change-password}">
+                    🔐 Đổi mật khẩu
+                </a>
+
+                <form class="dropdown-form" th:action="@{/logout}" method="post">
+                    <button class="dropdown-submit danger" type="submit">
+                        🚪 Đăng xuất
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main class="main-content">
+    <div class="success-message" th:if="${successMessage}" th:text="${successMessage}">
+        Đổi mật khẩu thành công
+    </div>
+
+    <section class="map-card"
+             th:if="${role != null and (role.toString() == 'ADMIN' or role.toString() == 'MANAGER')}">
+        <div class="map-toolbar">
+            <div class="map-title-block">
+                <h1>Trang chính theo dõi GPS xe</h1>
+                <p>
+                    Dữ liệu GPS auto 10s. 
+                    Bấm vào biểu tượng để xem chi tiết về xe.
+                </p>
+            </div>
+
+            <button class="btn" type="button" onclick="loadVehicleMarkers(true)">
+                Tải lại dữ liệu
+            </button>
+        </div>
+
+        <div id="map"></div>
+
+        <p class="map-status" id="mapStatus">
+            Đang khởi tạo bản đồ...
+        </p>
+    </section>
+
+    <section class="driver-card"
+             th:if="${role != null and role.toString() == 'DRIVER'}">
+        <h1>Trang chính tài xế</h1>
+        <p>
+            Tài khoản tài xế dùng trang GPS riêng để gửi vị trí trong quá trình vận chuyển.
+        </p>
+        <a class="btn" th:href="@{/driver/gps}">
+            Mở trang GPS tài xế
+        </a>
+    </section>
+</main>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script th:inline="javascript">
+    const currentRole = /*[[${role}]]*/ "UNKNOWN";
+    const vehicleMarkersUrl = /*[[@{/api/gps/latest/vehicle-markers}]]*/ "/api/gps/latest/vehicle-markers";
+
+    let map = null;
+    let markerLayer = null;
+    let firstFitBoundsDone = false;
+
+    initDropdownMenus();
+
+    if (currentRole === "ADMIN" || currentRole === "MANAGER") {
+        initGpsMap();
+    }
+
+    function initDropdownMenus() {
+        document.querySelectorAll("[data-menu-button]").forEach(button => {
+            button.addEventListener("click", event => {
+                event.stopPropagation();
+
+                const menuId = button.getAttribute("data-menu-button");
+                const menu = document.getElementById(menuId);
+
+                document.querySelectorAll(".dropdown-panel").forEach(panel => {
+                    if (panel !== menu) {
+                        panel.classList.remove("show");
+                    }
+                });
+
+                menu.classList.toggle("show");
+            });
+        });
+
+        document.addEventListener("click", event => {
+            if (!event.target.closest(".header-menu")) {
+                document.querySelectorAll(".dropdown-panel").forEach(panel => {
+                    panel.classList.remove("show");
+                });
+            }
+        });
+
+        document.addEventListener("keydown", event => {
+            if (event.key === "Escape") {
+                document.querySelectorAll(".dropdown-panel").forEach(panel => {
+                    panel.classList.remove("show");
+                });
+            }
+        });
+    }
+
+    function initGpsMap() {
+        map = L.map("map").setView([16.047079, 108.206230], 6);
+
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            maxZoom: 19,
+            attribution: "&copy; OpenStreetMap contributors"
+        }).addTo(map);
+
+        markerLayer = L.layerGroup().addTo(map);
+
+        setTimeout(() => {
+            map.invalidateSize();
+            loadVehicleMarkers(true);
+        }, 200);
+
+        window.addEventListener("resize", () => {
+            map.invalidateSize();
+        });
+
+        setInterval(() => loadVehicleMarkers(false), 10000);
+    }
+
+    function loadVehicleMarkers(shouldFitBounds) {
+        const status = document.getElementById("mapStatus");
+
+        if (!status || !markerLayer) {
+            return;
+        }
+
+        status.innerText = "Đang tải dữ liệu GPS...";
+
+        fetch(vehicleMarkersUrl)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Không tải được dữ liệu GPS. Mã lỗi: " + response.status);
+                }
+
+                return response.json();
+            })
+            .then(data => {
+                renderVehicleMarkers(data, shouldFitBounds);
+            })
+            .catch(error => {
+                status.innerText = "Lỗi: " + error.message;
+            });
+    }
+
+    function renderVehicleMarkers(data, shouldFitBounds) {
+        markerLayer.clearLayers();
+
+        const status = document.getElementById("mapStatus");
+
+        if (!Array.isArray(data) || data.length === 0) {
+            status.innerText = "Chưa có xe nào có dữ liệu GPS gắn với chuyến/xe.";
+            return;
+        }
+
+        const bounds = [];
+
+        data.forEach(item => {
+            if (item.latitude == null || item.longitude == null) {
+                return;
+            }
+
+            const latLng = [item.latitude, item.longitude];
+            bounds.push(latLng);
+
+            const markerTitle = item.licensePlate || ("Xe ID " + safe(item.vehicleId));
+
+            const marker = L.marker(latLng)
+                .bindPopup(buildPopupContent(item), {
+                    maxWidth: 360
+                })
+                .bindTooltip(markerTitle);
+
+            markerLayer.addLayer(marker);
+        });
+
+        if (bounds.length > 0 && (shouldFitBounds || !firstFitBoundsDone)) {
+            map.fitBounds(bounds, {
+                padding: [40, 40],
+                maxZoom: 15
+            });
+            firstFitBoundsDone = true;
+        }
+
+        const nowText = new Date().toLocaleString("vi-VN");
+        status.innerText = "Đã tải " + data.length + " xe. Cập nhật lúc: " + nowText;
+    }
+
+    function buildPopupContent(item) {
+        const tripText = item.tripCode
+            ? item.tripCode + " - " + safe(item.tripStatusDisplayName)
+            : "Chưa gắn chuyến";
+
+        const driverText = item.driverFullName
+            ? item.driverFullName + formatCode(item.driverCode)
+            : "Chưa có tài xế";
+
+        const pickupText = item.pickupName
+            ? safe(item.pickupName) + formatCode(item.pickupCode) + "<br>" + safe(item.pickupAddress)
+            : "Chưa có điểm lấy";
+
+        const deliveryText = item.deliveryName
+            ? safe(item.deliveryName) + formatCode(item.deliveryCode) + "<br>" + safe(item.deliveryAddress)
+            : "Chưa có điểm giao";
+
+        const recordedText = item.recordedAt
+            ? new Date(item.recordedAt).toLocaleString("vi-VN")
+            : "-";
+
+        const accuracyText = item.accuracyMeter != null
+            ? item.accuracyMeter + " mét"
+            : "-";
+
+        return `
+            <div>
+                <div class="popup-title">Xe: ${safe(item.licensePlate || ("ID " + item.vehicleId))}</div>
+
+                <div class="popup-row">
+                    <span class="popup-label">Loại xe:</span>
+                    ${safe(item.vehicleType)}
+                </div>
+
+                <div class="popup-row">
+                    <span class="popup-label">Tải trọng:</span>
+                    ${safe(item.vehicleCapacity)}
+                </div>
+
+                <hr>
+
+                <div class="popup-row">
+                    <span class="popup-label">Tài xế:</span>
+                    ${driverText}
+                </div>
+
+                <div class="popup-row">
+                    <span class="popup-label">Chuyến:</span>
+                    ${safe(tripText)}
+                </div>
+
+                <div class="popup-row">
+                    <span class="popup-label">Điểm lấy:</span><br>
+                    ${pickupText}
+                </div>
+
+                <div class="popup-row">
+                    <span class="popup-label">Điểm giao:</span><br>
+                    ${deliveryText}
+                </div>
+
+                <hr>
+
+                <div class="popup-row">
+                    <span class="popup-label">Vĩ độ:</span>
+                    ${safe(item.latitude)}
+                </div>
+
+                <div class="popup-row">
+                    <span class="popup-label">Kinh độ:</span>
+                    ${safe(item.longitude)}
+                </div>
+
+                <div class="popup-row">
+                    <span class="popup-label">Độ chính xác:</span>
+                    ${safe(accuracyText)}
+                </div>
+
+                <div class="popup-row">
+                    <span class="popup-label">Cập nhật GPS:</span>
+                    ${safe(recordedText)}
+                </div>
+            </div>
+        `;
+    }
+
+    function formatCode(code) {
+        if (!code) {
+            return "";
+        }
+
+        return " (" + safe(code) + ")";
+    }
+
+    function safe(value) {
+        if (value == null || value === "") {
+            return "-";
+        }
+
+        return String(value)
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#039;");
+    }
+</script>
 </body>
 </html>

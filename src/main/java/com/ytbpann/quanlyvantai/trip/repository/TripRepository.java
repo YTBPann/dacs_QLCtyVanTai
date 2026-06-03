@@ -29,4 +29,7 @@ public interface TripRepository extends JpaRepository<Trip, Long> {
     boolean existsByVehicleAndStatusIn(Vehicle vehicle, Collection<TripStatus> statuses);
 
     boolean existsByVehicleAndStatusInAndIdNot(Vehicle vehicle, Collection<TripStatus> statuses, Long id);
+
+    @EntityGraph(attributePaths = {"driver", "vehicle", "pickupLocation", "deliveryLocation"})
+    Optional<Trip> findTopByDriverAndStatusOrderByIdDesc(UserAccount driver, TripStatus status);
 }

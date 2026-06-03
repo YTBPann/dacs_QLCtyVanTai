@@ -37,4 +37,12 @@ public interface DriverProfileRepository extends JpaRepository<DriverProfile, Lo
             where dp.id = :id
             """)
     Optional<DriverProfile> findByIdWithLinkedUserAccount(@Param("id") Long id);
+
+    @Query("""
+            select dp
+            from DriverProfile dp
+            left join fetch dp.linkedUserAccount
+            where lower(dp.linkedUserAccount.username) = lower(:username)
+            """)
+    Optional<DriverProfile> findByLinkedUsernameWithLinkedUserAccount(@Param("username") String username);
 }

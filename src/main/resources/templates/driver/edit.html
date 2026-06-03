@@ -2,80 +2,136 @@
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title th:text="${pageTitle}">Cập nhật tài xế</title>
+    <title th:text="${pageTitle} + ' - Quản lý vận tải'">Cập nhật tài xế - Quản lý vận tải</title>
+
+    <link rel="stylesheet" th:href="@{/css/app.css}">
 </head>
 <body>
-<h1 th:text="${pageTitle}">Cập nhật tài xế</h1>
 
-<div th:if="${successMessage}" style="color: green; margin-bottom: 12px;">
-    <span th:text="${successMessage}"></span>
-</div>
+<div th:replace="~{fragments/app-header :: appHeader}"></div>
 
-<div th:if="${errorMessage}" style="color: red; margin-bottom: 12px;">
-    <span th:text="${errorMessage}"></span>
-</div>
+<main class="page-container">
+    <section class="page-card">
+        <div class="page-header-row">
+            <div>
+                <h1 class="page-title" th:text="${pageTitle}">Cập nhật tài xế</h1>
+                <p class="page-desc">
+                    Cập nhật thông tin hồ sơ tài xế. Trạng thái đăng nhập của tài xế được quản lý tại trang Quản lý người dùng.
+                </p>
+            </div>
 
-<p style="margin-bottom: 12px;">
-    Trạng thái đăng nhập của tài xế được quản lý tại trang Quản lý người dùng.
-</p>
+            <a class="btn-secondary" th:href="@{/admin/drivers}">
+                Quay lại danh sách
+            </a>
+        </div>
 
-<form th:action="@{/admin/drivers/{id}/edit(id=${driverId})}"
-      th:object="${driverUpdateRequest}"
-      method="post">
+        <div th:if="${successMessage}" class="success-message">
+            <span th:text="${successMessage}"></span>
+        </div>
 
-    <input type="hidden" th:field="*{active}">
+        <div th:if="${errorMessage}" class="global-error">
+            <span th:text="${errorMessage}"></span>
+        </div>
 
-    <div style="margin-bottom: 10px;">
-        <label for="driverCode">Mã tài xế</label><br>
-        <input type="text" id="driverCode" th:field="*{driverCode}" style="width: 320px;">
-    </div>
+        <form th:action="@{/admin/drivers/{id}/edit(id=${driverId})}"
+              th:object="${driverUpdateRequest}"
+              method="post">
 
-    <div style="margin-bottom: 10px;">
-        <label for="fullName">Họ tên</label><br>
-        <input type="text" id="fullName" th:field="*{fullName}" style="width: 320px;">
-    </div>
+            <input type="hidden"
+                   th:if="${_csrf != null}"
+                   th:name="${_csrf.parameterName}"
+                   th:value="${_csrf.token}">
 
-    <div style="margin-bottom: 10px;">
-        <label for="phoneNumber">Số điện thoại</label><br>
-        <input type="text" id="phoneNumber" th:field="*{phoneNumber}" style="width: 320px;">
-    </div>
+            <input type="hidden" th:field="*{active}">
 
-    <div style="margin-bottom: 10px;">
-        <label for="licenseNumber">Số GPLX</label><br>
-        <input type="text" id="licenseNumber" th:field="*{licenseNumber}" style="width: 320px;">
-    </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="driverCode">Mã tài xế</label>
+                    <input type="text" id="driverCode" th:field="*{driverCode}">
+                    <div class="error"
+                         th:if="${#fields.hasErrors('driverCode')}"
+                         th:errors="*{driverCode}">
+                    </div>
+                </div>
 
-    <div style="margin-bottom: 10px;">
-        <label for="licenseExpiryDate">Ngày hết hạn GPLX</label><br>
-        <input type="date" id="licenseExpiryDate" th:field="*{licenseExpiryDate}" style="width: 320px;">
-    </div>
+                <div class="form-group">
+                    <label for="fullName">Họ tên</label>
+                    <input type="text" id="fullName" th:field="*{fullName}">
+                    <div class="error"
+                         th:if="${#fields.hasErrors('fullName')}"
+                         th:errors="*{fullName}">
+                    </div>
+                </div>
 
-    <div style="margin-bottom: 10px;">
-        <label for="address">Địa chỉ</label><br>
-        <textarea id="address" th:field="*{address}" rows="3" style="width: 320px;"></textarea>
-    </div>
+                <div class="form-group">
+                    <label for="phoneNumber">Số điện thoại</label>
+                    <input type="text" id="phoneNumber" th:field="*{phoneNumber}">
+                    <div class="error"
+                         th:if="${#fields.hasErrors('phoneNumber')}"
+                         th:errors="*{phoneNumber}">
+                    </div>
+                </div>
 
-    <div style="margin-bottom: 10px;">
-        <label for="notes">Ghi chú</label><br>
-        <textarea id="notes" th:field="*{notes}" rows="4" style="width: 320px;"></textarea>
-    </div>
+                <div class="form-group">
+                    <label for="licenseNumber">Số GPLX</label>
+                    <input type="text" id="licenseNumber" th:field="*{licenseNumber}">
+                    <div class="error"
+                         th:if="${#fields.hasErrors('licenseNumber')}"
+                         th:errors="*{licenseNumber}">
+                    </div>
+                </div>
 
-    <div style="margin-bottom: 10px;">
-        <label for="linkedUserAccountId">Tài khoản DRIVER liên kết</label><br>
-        <select id="linkedUserAccountId" th:field="*{linkedUserAccountId}" style="width: 328px;">
-            <option th:value="''">-- Không liên kết tài khoản --</option>
-            <option th:each="account : ${availableDriverAccounts}"
-                    th:value="${account.id}"
-                    th:text="${account.username} + ' - ' + ${account.fullName}">
-            </option>
-        </select>
-    </div>
+                <div class="form-group">
+                    <label for="licenseExpiryDate">Ngày hết hạn GPLX</label>
+                    <input type="date" id="licenseExpiryDate" th:field="*{licenseExpiryDate}">
+                    <div class="error"
+                         th:if="${#fields.hasErrors('licenseExpiryDate')}"
+                         th:errors="*{licenseExpiryDate}">
+                    </div>
+                </div>
 
-    <div style="margin-top: 16px;">
-        <button type="submit">Lưu cập nhật</button>
-        <a th:href="@{/admin/drivers}" style="margin-left: 10px;">Quay lại danh sách</a>
-    </div>
-</form>
+                <div class="form-group">
+                    <label for="linkedUserAccountId">Tài khoản DRIVER liên kết</label>
+                    <select id="linkedUserAccountId" th:field="*{linkedUserAccountId}">
+                        <option th:value="''">-- Không liên kết tài khoản --</option>
+                        <option th:each="account : ${availableDriverAccounts}"
+                                th:value="${account.id}"
+                                th:text="${account.username + ' - ' + account.fullName}">
+                        </option>
+                    </select>
+                    <div class="text-muted" style="margin-top: 6px;">
+                        Chỉ hiển thị các tài khoản DRIVER còn khả dụng hoặc tài khoản đang liên kết với hồ sơ này.
+                    </div>
+                </div>
 
+                <div class="form-group full-width">
+                    <label for="address">Địa chỉ</label>
+                    <textarea id="address" th:field="*{address}" rows="3"></textarea>
+                    <div class="error"
+                         th:if="${#fields.hasErrors('address')}"
+                         th:errors="*{address}">
+                    </div>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="notes">Ghi chú</label>
+                    <textarea id="notes" th:field="*{notes}" rows="4"></textarea>
+                    <div class="error"
+                         th:if="${#fields.hasErrors('notes')}"
+                         th:errors="*{notes}">
+                    </div>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button class="btn-primary" type="submit">
+                    Lưu cập nhật
+                </button>
+            </div>
+        </form>
+    </section>
+</main>
+
+<script th:src="@{/js/app.js}"></script>
 </body>
 </html>

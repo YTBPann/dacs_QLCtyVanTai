@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Bản đồ GPS - Quản lý vận tải</title>
+
+    <link rel="stylesheet"
+          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            background: #1e293b;
+            color: white;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 24px auto;
+            padding: 0 16px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+        }
+
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-block;
+            background: #2563eb;
+            color: white;
+            border: none;
+            text-decoration: none;
+            padding: 10px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: #1d4ed8;
+        }
+
+        .status {
+            color: #475569;
+            font-size: 14px;
+        }
+
+        #map {
+            width: 100%;
+            height: 640px;
+            border-radius: 12px;
+            border: 1px solid #cbd5e1;
+        }
+
+        .popup-title {
+            font-weight: 700;
+            font-size: 15px;
+            margin-bottom: 6px;
+        }
+
+        .popup-row {
+            margin: 3px 0;
+        }
+
+        .popup-label {
+            font-weight: 600;
+        }
+
+        .hint {
+            color: #64748b;
+            line-height: 1.6;
+            margin-top: 0;
+        }
+
+        .vehicle-leaflet-icon {
+            background: transparent;
+            border: none;
+        }
+
+        .vehicle-map-marker {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 3px solid #64748b;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 19px;
+            line-height: 1;
+        }
+
+        .vehicle-map-marker.status-active {
+            border-color: #16a34a;
+        }
+
+        .vehicle-map-marker.status-inactive {
+            border-color: #dc2626;
+        }
+
+        .vehicle-map-marker.status-in-progress {
+            border-color: #f59e0b;
+        }
+
+        .vehicle-map-marker.status-planned {
+            border-color: #2563eb;
+        }
+
+        .vehicle-map-marker.status-completed {
+            border-color: #6b7280;
+        }
+
+        .vehicle-map-marker.status-unknown {
+            border-color: #94a3b8;
+        }
+
+        .vehicle-map-marker span {
+            transform: translateY(1px);
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <a th:href="@{/dashboard}">← Dashboard</a>
+    <b>Bản đồ GPS xe vận tải</b>
+</div>
+
+<div class="container">
+    <div class="card">
+        <div class="toolbar">
+            <div>
+                <h2 style="margin-bottom: 6px;">Theo dõi vị trí xe</h2>
+                <p class="hint">
+                    Dữ liệu lấy từ gps auto 10s.
+                </p>
+            </div>
+
+            <button class="btn" type="button" onclick="loadVehicleMarkers(true)">
+                Tải lại dữ liệu
+            </button>
+        </div>
+
+        <div id="map"></div>
+
+        <p class="status" id="mapStatus">
+            Đang khởi tạo bản đồ...
+        </p>
+    </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script th:inline="javascript">
+    const vehicleMarkersUrl = /*[[@{/api/gps/latest/vehicle-markers}]]*/ "/api/gps/latest/vehicle-markers";
+
+    const map = L.map("map").setView([16.047079, 108.206230], 6);
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: "&copy; OpenStreetMap contributors"
+    }).addTo(map);
+
+    const markerLayer = L.layerGroup().addTo(map);
+    let firstFitBoundsDone = false;
+
+    loadVehicleMarkers(true);
+    setInterval(() => loadVehicleMarkers(false), 10000);
+
+    function loadVehicleMarkers(shouldFitBounds) {
+        const status = document.getElementById("mapStatus");
+        status.innerText = "Đang tải dữ liệu GPS...";
+
+        fetch(vehicleMarkersUrl)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Không tải được dữ liệu GPS. Mã lỗi: " + response.status);
+                }
+
+                return response.json();
+            })
+            .then(data => {
+                renderVehicleMarkers(data, shouldFitBounds);
+            })
+            .catch(error => {
+                status.innerText = "Lỗi: " + error.message;
+            });
+    }
+
+    function renderVehicleMarkers(data, shouldFitBounds) {
+        markerLayer.clearLayers();
+
+        const status = document.getElementById("mapStatus");
+
+        if (!Array.isArray(data) || data.length === 0) {
+            status.innerText = "Chưa có xe nào có dữ liệu GPS gắn với chuyến/xe.";
+            return;
+        }
+
+        const bounds = [];
+
+        data.forEach(item => {
+            if (item.latitude == null || item.longitude == null) {
+                return;
+            }
+
+            const latLng = [item.latitude, item.longitude];
+            bounds.push(latLng);
+
+            const markerTitle = item.licensePlate || ("Xe ID " + safe(item.vehicleId));
+
+            const marker = L.marker(latLng, {
+                icon: createVehicleMapIcon(item)
+            })
+                .bindPopup(buildPopupContent(item), {
+                    maxWidth: 360
+                })
+                .bindTooltip(markerTitle);
+
+            markerLayer.addLayer(marker);
+        });
+
+        if (bounds.length > 0 && (shouldFitBounds || !firstFitBoundsDone)) {
+            map.fitBounds(bounds, {
+                padding: [40, 40],
+                maxZoom: 15
+            });
+            firstFitBoundsDone = true;
+        }
+
+        const nowText = new Date().toLocaleString("vi-VN");
+        status.innerText = "Đã tải " + data.length + " xe. Cập nhật lúc: " + nowText;
+    }
+
+    function normalizeVehicleMapStatus(item) {
+        if (!item) {
+            return "unknown";
+        }
+
+        if (item.vehicleActive === false || item.active === false) {
+            return "inactive";
+        }
+
+        const rawStatus = String(
+            item.tripStatus ||
+            item.status ||
+            item.gpsStatus ||
+            item.vehicleStatus ||
+            ""
+        ).toUpperCase();
+
+        if (rawStatus === "IN_PROGRESS") {
+            return "in-progress";
+        }
+
+        if (rawStatus === "PLANNED") {
+            return "planned";
+        }
+
+        if (rawStatus === "COMPLETED") {
+            return "completed";
+        }
+
+        if (
+            rawStatus === "INACTIVE" ||
+            rawStatus === "DISABLED" ||
+            rawStatus === "OFFLINE"
+        ) {
+            return "inactive";
+        }
+
+        if (
+            rawStatus === "ACTIVE" ||
+            rawStatus === "ONLINE" ||
+            item.vehicleActive === true ||
+            item.active === true
+        ) {
+            return "active";
+        }
+
+        return "unknown";
+    }
+
+    function createVehicleMapIcon(item) {
+        const statusClass = "status-" + normalizeVehicleMapStatus(item);
+
+        return L.divIcon({
+            className: "vehicle-leaflet-icon",
+            html: `
+                <div class="vehicle-map-marker ${statusClass}">
+                    <span>🚚</span>
+                </div>
+            `,
+            iconSize: [36, 36],
+            iconAnchor: [18, 18],
+            popupAnchor: [0, -20]
+        });
+    }
+
+    function buildPopupContent(item) {
+        const tripText = item.tripCode
+            ? item.tripCode + " - " + safe(item.tripStatusDisplayName)
+            : "Chưa gắn chuyến";
+
+        const driverText = item.driverFullName
+            ? item.driverFullName + formatCode(item.driverCode)
+            : "Chưa có tài xế";
+
+        const pickupText = item.pickupName
+            ? safe(item.pickupName) + formatCode(item.pickupCode) + "<br>" + safe(item.pickupAddress)
+            : "Chưa có điểm lấy";
+
+        const deliveryText = item.deliveryName
+            ? safe(item.deliveryName) + formatCode(item.deliveryCode) + "<br>" + safe(item.deliveryAddress)
+            : "Chưa có điểm giao";
+
+        const recordedText = item.recordedAt
+            ? new Date(item.recordedAt).toLocaleString("vi-VN")
+            : "-";
+
+        const accuracyText = item.accuracyMeter != null
+            ? item.accuracyMeter + " mét"
+            : "-";
+
+        return `
+            <div>
+                <div class="popup-title">Xe: ${safe(item.licensePlate || ("ID " + item.vehicleId))}</div>
+
+                <div class="popup-row">
+                    <span class="popup-label">Loại xe:</span>
+                    ${safe(item.vehicleType)}
+                </div>
+
+                <div class="popup-row">
+                    <span class="popup-label">Tải trọng:</span>
+                    ${safe(item.vehicleCapacity)}
+                </div>
+
+                <hr>
+
+                <div class="popup-row">
+                    <span class="popup-label">Tài xế:</span>
+                    ${driverText}
+                </div>
+
+                <div class="popup-row">
+                    <span class="popup-label">Chuyến:</span>
+                    ${safe(tripText)}
+                </div>
+
+                <div class="popup-row">
+                    <span class="popup-label">Điểm lấy:</span><br>
+                    ${pickupText}
+                </div>
+
+                <div class="popup-row">
+                    <span class="popup-label">Điểm giao:</span><br>
+                    ${deliveryText}
+                </div>
+
+                <hr>
+
+                <div class="popup-row">
+                    <span class="popup-label">Vĩ độ:</span>
+                    ${safe(item.latitude)}
+                </div>
+
+                <div class="popup-row">
+                    <span class="popup-label">Kinh độ:</span>
+                    ${safe(item.longitude)}
+                </div>
+
+                <div class="popup-row">
+                    <span class="popup-label">Độ chính xác:</span>
+                    ${safe(accuracyText)}
+                </div>
+
+                <div class="popup-row">
+                    <span class="popup-label">Cập nhật GPS:</span>
+                    ${safe(recordedText)}
+                </div>
+            </div>
+        `;
+    }
+
+    function formatCode(code) {
+        if (!code) {
+            return "";
+        }
+
+        return " (" + safe(code) + ")";
+    }
+
+    function safe(value) {
+        if (value == null || value === "") {
+            return "-";
+        }
+
+        return String(value)
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#039;");
+    }
+</script>
+</body>
+</html>

@@ -2,293 +2,162 @@
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Danh sách tài xế</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-        }
+    <title>Quản lý hồ sơ tài xế - Quản lý vận tải</title>
 
-        .driver-table {
-            border-collapse: collapse;
-            width: 100%;
-            max-width: 1180px;
-            table-layout: fixed;
-        }
-
-        .driver-table th,
-        .driver-table td {
-            border: 1px solid #999;
-            padding: 9px 12px;
-            vertical-align: middle;
-            word-wrap: break-word;
-        }
-
-        .driver-table th {
-            background: #f3f4f6;
-            text-align: center;
-        }
-
-        .col-id {
-            width: 50px;
-            text-align: center;
-        }
-
-        .col-code {
-            width: 95px;
-            text-align: center;
-        }
-
-        .col-name {
-            width: 150px;
-        }
-
-        .col-phone {
-            width: 120px;
-        }
-
-        .col-license {
-            width: 120px;
-        }
-
-        .col-expiry {
-            width: 105px;
-            text-align: center;
-        }
-
-        .col-account {
-            width: 150px;
-        }
-
-        .col-status {
-            width: 150px;
-            text-align: center;
-        }
-
-        .col-action {
-            width: 130px;
-            text-align: center;
-        }
-
-        .flash-success {
-            color: #15803d;
-            margin-bottom: 12px;
-        }
-
-        .flash-error {
-            color: #b91c1c;
-            margin-bottom: 12px;
-        }
-
-        .status-badge {
-            display: inline-block;
-            min-width: 120px;
-            padding: 6px 10px;
-            border-radius: 999px;
-            font-size: 13px;
-            font-weight: 600;
-            text-align: center;
-            box-sizing: border-box;
-        }
-
-        .status-active {
-            background: #dcfce7;
-            color: #166534;
-        }
-
-        .status-locked {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-        .status-unlinked {
-            background: #e5e7eb;
-            color: #374151;
-        }
-
-        .btn {
-            width: 100%;
-            box-sizing: border-box;
-            padding: 7px 10px;
-            border: 1px solid #999;
-            border-radius: 6px;
-            background: #f8f9fa;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-            color: #111827;
-            font-size: 14px;
-            font-weight: 700;
-            text-align: center;
-        }
-
-        .btn:hover {
-            background: #eceff3;
-        }
-
-        .btn-danger {
-            background: #fee2e2;
-            border-color: #fca5a5;
-            color: #991b1b;
-        }
-
-        .btn-danger:hover {
-            background: #fecaca;
-        }
-
-        .btn-success {
-            background: #dcfce7;
-            border-color: #86efac;
-            color: #166534;
-        }
-
-        .btn-success:hover {
-            background: #bbf7d0;
-        }
-
-        .btn-edit {
-            background: #0f766e;
-            border-color: #0f766e;
-            color: white;
-        }
-
-        .btn-edit:hover {
-            background: #0d625d;
-        }
-
-        .btn-disabled {
-            background: #e5e7eb;
-            border-color: #d1d5db;
-            color: #374151;
-            cursor: not-allowed;
-        }
-
-        .action-group {
-            display: flex;
-            flex-direction: column;
-            align-items: stretch;
-            gap: 6px;
-        }
-
-        .action-group form {
-            margin: 0;
-        }
-
-        .empty-row {
-            text-align: center;
-            padding: 18px;
-            color: #64748b;
-            font-weight: 600;
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
 </head>
 <body>
-<h1>Danh sách tài xế</h1>
 
-<div th:if="${successMessage != null}" class="flash-success">
-    <span th:text="${successMessage}"></span>
-</div>
+<div th:replace="~{fragments/app-header :: appHeader}"></div>
 
-<div th:if="${errorMessage != null}" class="flash-error">
-    <span th:text="${errorMessage}"></span>
-</div>
+<main class="page-container">
+    <section class="page-card">
+        <div class="page-header-row">
+            <div>
+                <h1 class="page-title">Quản lý hồ sơ tài xế</h1>
+                <p class="page-desc">
+                    Theo dõi hồ sơ tài xế, giấy phép lái xe, tài khoản liên kết và trạng thái đăng nhập.
+                </p>
+            </div>
 
-<p>
-    <a th:href="@{/users/create}">Tạo user mới</a>
-</p>
+            <div class="actions" style="margin-top: 0;">
+                <a class="btn-secondary"
+                th:if="${role != null and role.toString() == 'ADMIN'}"
+                th:href="@{/users/create}">
+                    Tạo tài khoản DRIVER
+                </a>
 
-<table class="driver-table">
-    <thead>
-    <tr>
-        <th class="col-id">ID</th>
-        <th class="col-code">Mã tài xế</th>
-        <th class="col-name">Họ tên</th>
-        <th class="col-phone">SĐT</th>
-        <th class="col-license">Số GPLX</th>
-        <th class="col-expiry">Hạn GPLX</th>
-        <th class="col-account">Tài khoản liên kết</th>
-        <th class="col-status">Trạng thái</th>
-        <th class="col-action">Thao tác</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    <tr th:if="${#lists.isEmpty(drivers)}">
-        <td colspan="9" class="empty-row">Chưa có tài xế nào.</td>
-    </tr>
-
-    <tr th:each="driver : ${drivers}">
-        <td class="col-id" th:text="${driver.id}"></td>
-
-        <td class="col-code" th:text="${driver.driverCode}"></td>
-
-        <td class="col-name" th:text="${driver.fullName}"></td>
-
-        <td class="col-phone"
-            th:text="${driver.phoneNumber != null && !driver.phoneNumber.isBlank() ? driver.phoneNumber : '-'}"></td>
-
-        <td class="col-license" th:text="${driver.licenseNumber}"></td>
-
-        <td class="col-expiry" th:text="${driver.licenseExpiryDate != null ? driver.licenseExpiryDate : '-'}"></td>
-
-        <td class="col-account"
-            th:text="${driver.linkedUserAccount != null ? driver.linkedUserAccount.username : '-'}"></td>
-
-        <td class="col-status">
-            <span th:if="${driver.linkedUserAccount == null}"
-                  class="status-badge status-unlinked">
-                Chưa liên kết
-            </span>
-
-            <span th:if="${driver.linkedUserAccount != null && driver.linkedUserAccount.enabled}"
-                  class="status-badge status-active">
-                Đang hoạt động
-            </span>
-
-            <span th:if="${driver.linkedUserAccount != null && !driver.linkedUserAccount.enabled}"
-                  class="status-badge status-locked">
-                Đã bị khóa
-            </span>
-        </td>
-
-        <td class="col-action">
-            <div class="action-group">
-                <span th:if="${driver.linkedUserAccount == null}"
-                      class="btn btn-disabled">
-                    Chưa liên kết
-                </span>
-
-                <form th:if="${driver.linkedUserAccount != null && driver.linkedUserAccount.enabled}"
-                      th:action="@{/admin/drivers/{id}/disable-account(id=${driver.id})}"
-                      method="post">
-                    <input type="hidden"
-                           th:if="${_csrf != null}"
-                           th:name="${_csrf.parameterName}"
-                           th:value="${_csrf.token}">
-                    <button type="submit" class="btn btn-danger">
-                        Tắt tài khoản
-                    </button>
-                </form>
-
-                <form th:if="${driver.linkedUserAccount != null && !driver.linkedUserAccount.enabled}"
-                      th:action="@{/admin/drivers/{id}/enable-account(id=${driver.id})}"
-                      method="post">
-                    <input type="hidden"
-                           th:if="${_csrf != null}"
-                           th:name="${_csrf.parameterName}"
-                           th:value="${_csrf.token}">
-                    <button type="submit" class="btn btn-success">
-                        Bật tài khoản
-                    </button>
-                </form>
-
-                <a class="btn btn-edit"
-                   th:href="@{/admin/drivers/{id}/edit(id=${driver.id})}">
-                    Sửa
+                <a class="btn-primary" th:href="@{/admin/drivers/create}">
+                    Tạo hồ sơ tài xế
                 </a>
             </div>
-        </td>
-    </tr>
-    </tbody>
-</table>
+        </div>
+
+        <div th:if="${successMessage != null}" class="success-message">
+            <span th:text="${successMessage}"></span>
+        </div>
+
+        <div th:if="${errorMessage != null}" class="global-error">
+            <span th:text="${errorMessage}"></span>
+        </div>
+
+        <div class="table-wrapper">
+            <table class="app-table">
+                <thead>
+                <tr>
+                    <th class="driver-col-id text-center">ID</th>
+                    <th class="driver-col-code text-center">Mã tài xế</th>
+                    <th class="driver-col-name">Họ tên</th>
+                    <th class="driver-col-phone">SĐT</th>
+                    <th class="driver-col-license">Số GPLX</th>
+                    <th class="driver-col-expiry text-center">Hạn GPLX</th>
+                    <th class="driver-col-account">Tài khoản liên kết</th>
+                    <th class="driver-col-status text-center">Trạng thái</th>
+                    <th class="driver-col-action text-center">Thao tác</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:if="${#lists.isEmpty(drivers)}">
+                    <td colspan="9" class="text-center text-muted">
+                        Chưa có tài xế nào.
+                    </td>
+                </tr>
+
+                <tr th:each="driver : ${drivers}">
+                    <td class="driver-col-id text-center" th:text="${driver.id}"></td>
+
+                    <td class="driver-col-code text-center" th:text="${driver.driverCode}"></td>
+
+                    <td class="driver-col-name" th:text="${driver.fullName}"></td>
+
+                    <td class="driver-col-phone"
+                        th:text="${driver.phoneNumber != null && !driver.phoneNumber.isBlank() ? driver.phoneNumber : '-'}">
+                    </td>
+
+                    <td class="driver-col-license" th:text="${driver.licenseNumber}"></td>
+
+                    <td class="driver-col-expiry text-center"
+                        th:text="${driver.licenseExpiryDate != null ? #temporals.format(driver.licenseExpiryDate, 'dd-MM-yyyy') : '-'}">
+                    </td>
+
+                    <td class="driver-col-account">
+                        <div th:if="${driver.linkedUserAccount != null}">
+                            <div class="linked-account-main"
+                                 th:text="${driver.linkedUserAccount.fullName != null && !driver.linkedUserAccount.fullName.isBlank() ? driver.linkedUserAccount.fullName : driver.linkedUserAccount.username}">
+                                Tên tài khoản
+                            </div>
+
+                            <div class="linked-account-sub">
+                                -
+                                <span th:text="${driver.linkedUserAccount.username}">username</span>
+                            </div>
+                        </div>
+
+                        <span th:if="${driver.linkedUserAccount == null}">-</span>
+                    </td>
+
+                    <td class="driver-col-status text-center">
+                        <span th:if="${driver.linkedUserAccount == null}"
+                              class="status-badge status-unlinked">
+                            Chưa liên kết
+                        </span>
+
+                        <span th:if="${driver.linkedUserAccount != null && driver.linkedUserAccount.enabled}"
+                              class="status-badge status-active">
+                            Đang hoạt động
+                        </span>
+
+                        <span th:if="${driver.linkedUserAccount != null && !driver.linkedUserAccount.enabled}"
+                              class="status-badge status-locked">
+                            Đã bị khóa
+                        </span>
+                    </td>
+
+                    <td class="driver-col-action">
+                        <div class="table-actions">
+                            <span th:if="${driver.linkedUserAccount == null}"
+                                  class="btn-small btn-disabled">
+                                Chưa liên kết
+                            </span>
+
+                            <form th:if="${driver.linkedUserAccount != null && driver.linkedUserAccount.enabled}"
+                                  th:action="@{/admin/drivers/{id}/disable-account(id=${driver.id})}"
+                                  method="post">
+                                <input type="hidden"
+                                       th:if="${_csrf != null}"
+                                       th:name="${_csrf.parameterName}"
+                                       th:value="${_csrf.token}">
+                                <button type="submit" class="btn-small btn-danger">
+                                    Tắt tài khoản
+                                </button>
+                            </form>
+
+                            <form th:if="${driver.linkedUserAccount != null && !driver.linkedUserAccount.enabled}"
+                                  th:action="@{/admin/drivers/{id}/enable-account(id=${driver.id})}"
+                                  method="post">
+                                <input type="hidden"
+                                       th:if="${_csrf != null}"
+                                       th:name="${_csrf.parameterName}"
+                                       th:value="${_csrf.token}">
+                                <button type="submit" class="btn-small btn-success">
+                                    Bật tài khoản
+                                </button>
+                            </form>
+
+                            <a class="btn-small btn-secondary"
+                               th:href="@{/admin/drivers/{id}/edit(id=${driver.id})}">
+                                Sửa
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+
+<script th:src="@{/js/app.js}"></script>
 </body>
 </html>

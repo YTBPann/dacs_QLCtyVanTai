@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Theo dõi GPS - Tài xế</title>
+
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            background: #1e293b;
+            color: white;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header a {
+            color: white;
+            text-decoration: none;
+            margin-right: 14px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 32px auto;
+            padding: 0 16px;
+        }
+
+        .card {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+        }
+
+        .btn {
+            border: none;
+            padding: 10px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: white;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+
+        .btn-start {
+            background: #2563eb;
+        }
+
+        .btn-stop {
+            background: #ef4444;
+        }
+
+        .btn-secondary {
+            display: inline-block;
+            background: #475569;
+            color: white;
+            text-decoration: none;
+            padding: 10px 14px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        .status-box {
+            margin-top: 16px;
+            padding: 12px 14px;
+            border-radius: 8px;
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            line-height: 1.7;
+        }
+
+        .status-ok {
+            background: #dcfce7;
+            border-color: #86efac;
+            color: #166534;
+        }
+
+        .status-error {
+            background: #fee2e2;
+            border-color: #fecaca;
+            color: #991b1b;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 180px 1fr;
+            gap: 8px 12px;
+            margin-top: 16px;
+        }
+
+        .label {
+            font-weight: bold;
+            color: #334155;
+        }
+
+        .value {
+            color: #111827;
+            word-break: break-word;
+        }
+
+        .note {
+            color: #64748b;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <div>
+        <a th:href="@{/dashboard}">← Dashboard</a>
+        <b>Theo dõi GPS tài xế</b>
+    </div>
+</div>
+
+<div class="container">
+    <div class="card">
+        <a class="btn-secondary" th:href="@{/dashboard}">Quay lại Dashboard</a>
+
+        <h2>Cập nhật vị trí GPS</h2>
+
+        <p class="note">
+            Trang này dùng định vị của trình duyệt để gửi vị trí hiện tại về hệ thống.
+            Khi có chuyến đang ở trạng thái <b>Đang vận chuyển</b>, vị trí sẽ được gắn với chuyến và xe tương ứng.
+        </p>
+
+        <button class="btn btn-start" type="button" onclick="startTracking()">
+            Bật cập nhật GPS
+        </button>
+
+        <button class="btn btn-stop" type="button" onclick="stopTracking()">
+            Tắt cập nhật GPS
+        </button>
+
+        <div id="statusBox" class="status-box">
+            Trạng thái: Chưa bật GPS.
+        </div>
+
+        <div class="info-grid">
+            <div class="label">Vĩ độ:</div>
+            <div class="value" id="latitude">-</div>
+
+            <div class="label">Kinh độ:</div>
+            <div class="value" id="longitude">-</div>
+
+            <div class="label">Độ chính xác:</div>
+            <div class="value" id="accuracy">-</div>
+
+            <div class="label">Lần gửi gần nhất:</div>
+            <div class="value" id="lastSentAt">-</div>
+
+            <div class="label">Chuyến đang gắn:</div>
+            <div class="value" id="tripInfo">-</div>
+
+            <div class="label">Xe đang gắn:</div>
+            <div class="value" id="vehicleInfo">-</div>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    const gpsUpdateUrl = /*[[@{/driver/gps/location}]]*/ "/driver/gps/location";
+    const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute("content");
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute("content");
+
+    let watchId = null;
+    let lastSentTimestamp = 0;
+
+    const MIN_SEND_INTERVAL_MS = 10000;
+
+    function startTracking() {
+        if (!navigator.geolocation) {
+            showError("Trình duyệt không hỗ trợ Geolocation.");
+            return;
+        }
+
+        if (watchId !== null) {
+            showInfo("GPS đang được bật rồi.");
+            return;
+        }
+
+        showInfo("Đang xin quyền truy cập vị trí...");
+
+        watchId = navigator.geolocation.watchPosition(
+            handlePosition,
+            handlePositionError,
+            {
+                enableHighAccuracy: true,
+                maximumAge: 5000,
+                timeout: 15000
+            }
+        );
+    }
+
+    function stopTracking() {
+        if (watchId !== null) {
+            navigator.geolocation.clearWatch(watchId);
+            watchId = null;
+            showInfo("Đã tắt cập nhật GPS.");
+            return;
+        }
+
+        showInfo("GPS hiện chưa bật.");
+    }
+
+    function handlePosition(position) {
+        const now = Date.now();
+
+        document.getElementById("latitude").innerText = position.coords.latitude;
+        document.getElementById("longitude").innerText = position.coords.longitude;
+        document.getElementById("accuracy").innerText = position.coords.accuracy
+            ? position.coords.accuracy + " mét"
+            : "-";
+
+        if (now - lastSentTimestamp < MIN_SEND_INTERVAL_MS) {
+            showInfo("Đã nhận vị trí, chờ đủ 10 giây để gửi lần tiếp theo.");
+            return;
+        }
+
+        lastSentTimestamp = now;
+        sendLocation(position);
+    }
+
+    function handlePositionError(error) {
+        if (error.code === error.PERMISSION_DENIED) {
+            showError("Bạn đã từ chối quyền truy cập vị trí.");
+            return;
+        }
+
+        if (error.code === error.POSITION_UNAVAILABLE) {
+            showError("Không lấy được vị trí hiện tại.");
+            return;
+        }
+
+        if (error.code === error.TIMEOUT) {
+            showError("Lấy vị trí quá thời gian chờ.");
+            return;
+        }
+
+        showError("Lỗi không xác định khi lấy vị trí.");
+    }
+
+    function sendLocation(position) {
+        const recordedAt = new Date(position.timestamp)
+            .toISOString()
+            .substring(0, 19);
+
+        const payload = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            accuracyMeter: position.coords.accuracy,
+            speedMeterPerSecond: position.coords.speed,
+            headingDegree: position.coords.heading,
+            source: "DRIVER_BROWSER",
+            recordedAt: recordedAt
+        };
+
+        fetch(gpsUpdateUrl, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                [csrfHeader]: csrfToken
+            },
+            body: JSON.stringify(payload)
+        })
+            .then(async response => {
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    throw new Error(data.message || "Gửi GPS thất bại.");
+                }
+
+                document.getElementById("lastSentAt").innerText = new Date().toLocaleString("vi-VN");
+
+                if (data.tripId) {
+                    document.getElementById("tripInfo").innerText = data.tripCode
+                        ? data.tripCode + " (ID: " + data.tripId + ")"
+                        : "ID: " + data.tripId;
+                } else {
+                    document.getElementById("tripInfo").innerText = "Chưa có chuyến IN_PROGRESS";
+                }
+
+                if (data.vehicleId) {
+                    document.getElementById("vehicleInfo").innerText = "ID xe: " + data.vehicleId;
+                } else {
+                    document.getElementById("vehicleInfo").innerText = "Chưa gắn xe";
+                }
+
+                showSuccess(data.message || "Đã gửi GPS thành công.");
+            })
+            .catch(error => {
+                showError(error.message);
+            });
+    }
+
+    function showInfo(message) {
+        const box = document.getElementById("statusBox");
+        box.className = "status-box";
+        box.innerText = "Trạng thái: " + message;
+    }
+
+    function showSuccess(message) {
+        const box = document.getElementById("statusBox");
+        box.className = "status-box status-ok";
+        box.innerText = "Trạng thái: " + message;
+    }
+
+    function showError(message) {
+        const box = document.getElementById("statusBox");
+        box.className = "status-box status-error";
+        box.innerText = "Trạng thái: " + message;
+    }
+</script>
+</body>
+</html>

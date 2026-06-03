@@ -1,0 +1,705 @@
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    min-height: 100%;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f7fb;
+    margin: 0;
+    padding: 0;
+    color: #0f172a;
+}
+
+/* ===== Header dùng chung ===== */
+
+.app-header {
+    height: 68px;
+    background: #1e293b;
+    color: white;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.18);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+}
+
+.home-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: white;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 18px;
+    min-width: 0;
+}
+
+.home-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: #334155;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 25px;
+    flex-shrink: 0;
+}
+
+.system-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.header-menu {
+    position: relative;
+}
+
+.circle-btn {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    border: none;
+    background: #334155;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    cursor: pointer;
+}
+
+.circle-btn:hover {
+    background: #475569;
+}
+
+.dropdown-panel {
+    display: none;
+    position: absolute;
+    top: 56px;
+    right: 0;
+    width: 310px;
+    background: #1f2937;
+    color: white;
+    border-radius: 14px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.32);
+    padding: 10px;
+    z-index: 2000;
+}
+
+.dropdown-panel.show {
+    display: block;
+}
+
+.dropdown-title {
+    padding: 12px 12px 8px;
+    font-weight: 700;
+    font-size: 15px;
+    color: #e5e7eb;
+}
+
+.dropdown-user {
+    padding: 12px;
+    border-bottom: 1px solid #374151;
+    margin-bottom: 8px;
+}
+
+.dropdown-user-name {
+    font-weight: 700;
+    font-size: 16px;
+    margin-bottom: 4px;
+}
+
+.dropdown-user-meta {
+    color: #cbd5e1;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.dropdown-item,
+.dropdown-submit {
+    width: 100%;
+    min-height: 42px;
+    border: none;
+    background: transparent;
+    color: #e5e7eb;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    padding: 10px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 15px;
+    text-align: left;
+    font-family: Arial, sans-serif;
+}
+
+.dropdown-item:hover,
+.dropdown-submit:hover {
+    background: #374151;
+}
+
+.dropdown-submit.danger {
+    color: #fecaca;
+}
+
+.dropdown-form {
+    margin: 0;
+}
+
+/* ===== Layout trang dùng chung ===== */
+
+.page-container {
+    max-width: 1180px;
+    margin: 28px auto;
+    padding: 0 16px;
+}
+
+.page-container.narrow {
+    max-width: 760px;
+}
+
+.page-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+    padding: 28px;
+}
+
+.page-title {
+    margin: 0 0 8px;
+    font-size: 26px;
+}
+
+.page-desc {
+    margin: 0 0 24px;
+    color: #64748b;
+    line-height: 1.5;
+}
+
+.success-message {
+    background: #dcfce7;
+    color: #166534;
+    border: 1px solid #86efac;
+    padding: 10px 14px;
+    border-radius: 10px;
+    margin-bottom: 14px;
+}
+
+.global-error {
+    color: #991b1b;
+    background: #fee2e2;
+    border: 1px solid #fca5a5;
+    padding: 12px 14px;
+    border-radius: 10px;
+    margin-bottom: 18px;
+    line-height: 1.5;
+}
+
+.error {
+    color: #dc2626;
+    margin-top: 6px;
+    font-size: 14px;
+}
+
+/* ===== Form dùng chung ===== */
+
+.form-group {
+    margin-bottom: 18px;
+}
+
+label {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 7px;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="number"],
+input[type="date"],
+input[type="datetime-local"],
+input[type="tel"],
+select,
+textarea {
+    width: 100%;
+    padding: 11px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    font-size: 15px;
+    outline: none;
+    font-family: Arial, sans-serif;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 92px;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 24px;
+    flex-wrap: wrap;
+}
+
+/* ===== Button dùng chung ===== */
+
+.btn-primary,
+.btn-secondary,
+.btn-danger,
+.btn-small {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    text-decoration: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-family: Arial, sans-serif;
+    font-weight: 700;
+}
+
+.btn-primary {
+    background: #2563eb;
+    color: white;
+    padding: 11px 16px;
+    font-size: 15px;
+}
+
+.btn-primary:hover {
+    background: #1d4ed8;
+}
+
+.btn-secondary {
+    background: #e2e8f0;
+    color: #0f172a;
+    padding: 11px 16px;
+    font-size: 15px;
+}
+
+.btn-secondary:hover {
+    background: #cbd5e1;
+}
+
+.btn-danger {
+    background: #ef4444;
+    color: white;
+    padding: 11px 16px;
+    font-size: 15px;
+}
+
+.btn-danger:hover {
+    background: #dc2626;
+}
+
+.btn-small {
+    padding: 7px 10px;
+    font-size: 13px;
+}
+
+/* ===== Table dùng chung ===== */
+
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.app-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.app-table th,
+.app-table td {
+    border: 1px solid #cbd5e1;
+    padding: 10px 12px;
+    vertical-align: middle;
+    word-wrap: break-word;
+}
+
+.app-table th {
+    background: #f1f5f9;
+    text-align: center;
+    font-weight: 700;
+}
+
+.app-table td {
+    background: white;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-muted {
+    color: #64748b;
+}
+
+/* ===== GPS map trang chính ===== */
+
+.main-content {
+    min-height: calc(100vh - 68px);
+    padding: 18px 20px 20px;
+}
+
+.map-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+    padding: 18px;
+    min-height: calc(100vh - 108px);
+}
+
+.map-toolbar {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 14px;
+}
+
+.map-title-block h1 {
+    font-size: 24px;
+    margin: 0 0 6px;
+}
+
+.map-title-block p {
+    margin: 0;
+    color: #64748b;
+    line-height: 1.5;
+}
+
+#map {
+    width: 100%;
+    height: calc(100vh - 210px);
+    min-height: 520px;
+    border-radius: 14px;
+    border: 1px solid #cbd5e1;
+}
+
+.map-status {
+    color: #475569;
+    font-size: 14px;
+    margin: 12px 0 0;
+}
+
+.popup-title {
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 6px;
+}
+
+.popup-row {
+    margin: 3px 0;
+}
+
+.popup-label {
+    font-weight: 600;
+}
+
+/* ===== Responsive ===== */
+
+@media (max-width: 760px) {
+    .app-header {
+        padding: 0 14px;
+    }
+
+    .system-name {
+        max-width: 190px;
+    }
+
+    .dropdown-panel {
+        width: 280px;
+    }
+
+    .page-container {
+        margin: 20px auto;
+        padding: 0 12px;
+    }
+
+    .page-card {
+        padding: 20px;
+    }
+
+    .main-content {
+        padding: 12px;
+    }
+
+    .map-card {
+        padding: 12px;
+    }
+
+    .map-toolbar {
+        flex-direction: column;
+    }
+
+    #map {
+        height: calc(100vh - 245px);
+        min-height: 440px;
+    }
+}
+/* ===== Badge trạng thái dùng chung ===== */
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 120px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.status-active {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.status-locked {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.status-admin {
+    background: #e5e7eb;
+    color: #374151;
+    min-width: 0;
+    width: 100%;
+}
+
+.btn-success {
+    background: #16a34a;
+    color: white;
+    padding: 11px 16px;
+    font-size: 15px;
+}
+
+.btn-success:hover {
+    background: #15803d;
+}
+
+/* ===== Thanh đầu trang danh sách ===== */
+
+.page-header-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+/* ===== Bảng quản lý user ===== */
+
+.user-col-id {
+    width: 70px;
+}
+
+.user-col-username {
+    width: 170px;
+}
+
+.user-col-fullname {
+    width: 260px;
+}
+
+.user-col-role {
+    width: 120px;
+}
+
+.user-col-status {
+    width: 170px;
+}
+
+.user-col-action {
+    width: 150px;
+}
+
+.table-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+}
+
+.table-actions form {
+    margin: 0;
+}
+
+.table-actions .btn-small {
+    width: 100%;
+}
+/* ===== Form nâng cao ===== */
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.form-section {
+    margin-top: 26px;
+    padding-top: 22px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.form-section-title {
+    margin: 0 0 14px;
+    font-size: 20px;
+}
+
+.form-section-desc {
+    margin: -6px 0 18px;
+    color: #64748b;
+    line-height: 1.5;
+}
+
+.checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+}
+
+.checkbox-row input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+}
+
+.user-summary {
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 22px;
+    line-height: 1.7;
+}
+
+.security-box {
+    background: #fffbeb;
+    border: 1px solid #facc15;
+    border-radius: 12px;
+    padding: 16px;
+    line-height: 1.6;
+}
+
+.security-box p {
+    margin-top: 0;
+}
+
+.btn-warning {
+    background: #f59e0b;
+    color: white;
+    padding: 11px 16px;
+    font-size: 15px;
+}
+
+.btn-warning:hover {
+    background: #d97706;
+}
+
+.btn-disabled {
+    background: #e5e7eb;
+    color: #6b7280;
+    padding: 11px 16px;
+    font-size: 15px;
+    cursor: not-allowed;
+}
+
+@media (max-width: 760px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ===== Driver Management ===== */
+
+.status-unlinked {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.driver-col-id {
+    width: 55px;
+}
+
+.driver-col-code {
+    width: 110px;
+}
+
+.driver-col-name {
+    width: 170px;
+}
+
+.driver-col-phone {
+    width: 115px;
+}
+
+.driver-col-license {
+    width: 120px;
+}
+
+.driver-col-expiry {
+    width: 110px;
+}
+
+.driver-col-account {
+    width: 150px;
+}
+
+.driver-col-status {
+    width: 145px;
+}
+
+.driver-col-action {
+    width: 140px;
+}
+
+.linked-account-main {
+    font-weight: 700;
+}
+
+.linked-account-sub {
+    color: #64748b;
+    font-size: 13px;
+    margin-top: 3px;
+}
