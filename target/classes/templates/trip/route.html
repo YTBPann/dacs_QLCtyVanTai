@@ -57,7 +57,7 @@
 
         #routeMap {
             width: 100%;
-            height: calc(100vh - 330px);
+            height: calc(100vh - 350px);
             min-height: 560px;
             border-radius: 12px;
             border: 1px solid #cbd5e1;
@@ -70,6 +70,41 @@
             line-height: 1.5;
         }
 
+        .route-legend {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+            color: #334155;
+            font-size: 14px;
+        }
+
+        .legend-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .legend-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .legend-start {
+            background: #16a34a;
+        }
+
+        .legend-end {
+            background: #dc2626;
+        }
+
+        .legend-route {
+            background: #2563eb;
+        }
+
         .route-popup-title {
             font-weight: 700;
             margin-bottom: 6px;
@@ -77,6 +112,33 @@
 
         .route-popup-row {
             margin: 3px 0;
+        }
+
+        .route-point-icon {
+            background: transparent;
+            border: none;
+        }
+
+        .route-point-marker {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            color: white;
+            border: 3px solid white;
+            box-shadow: 0 3px 10px rgba(15, 23, 42, 0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .route-point-marker.start {
+            background: #16a34a;
+        }
+
+        .route-point-marker.end {
+            background: #dc2626;
         }
 
         @media (max-width: 900px) {
@@ -95,7 +157,7 @@
             }
 
             #routeMap {
-                height: calc(100vh - 360px);
+                height: calc(100vh - 390px);
                 min-height: 420px;
             }
         }
@@ -156,6 +218,23 @@
             </div>
 
             <div id="routeMap"></div>
+
+            <div class="route-legend">
+                <span class="legend-item">
+                    <span class="legend-dot legend-start"></span>
+                    Điểm bắt đầu
+                </span>
+
+                <span class="legend-item">
+                    <span class="legend-dot legend-route"></span>
+                    Đường di chuyển
+                </span>
+
+                <span class="legend-item">
+                    <span class="legend-dot legend-end"></span>
+                    Điểm cuối
+                </span>
+            </div>
 
             <p class="route-status" id="routeStatus">
                 Đang tải lịch sử GPS của chuyến...
@@ -235,10 +314,21 @@
             const isFirst = index === 0;
             const isLast = index === validPoints.length - 1;
 
-            if (isFirst || isLast) {
-                const marker = L.marker([point.latitude, point.longitude])
-                    .bindPopup(buildPointPopup(point, isFirst, isLast));
-                routeLayer.addLayer(marker);
+            if (isFirst) {
+                const startMarker = L.marker([point.latitude, point.longitude], {
+                    icon: createRoutePointIcon("start", "BĐ")
+                }).bindPopup(buildPointPopup(point, true, false));
+
+                routeLayer.addLayer(startMarker);
+                return;
+            }
+
+            if (isLast) {
+                const endMarker = L.marker([point.latitude, point.longitude], {
+                    icon: createRoutePointIcon("end", "KT")
+                }).bindPopup(buildPointPopup(point, false, true));
+
+                routeLayer.addLayer(endMarker);
                 return;
             }
 
@@ -264,6 +354,20 @@
             "Đã tải " + validPoints.length +
             " điểm GPS. Bắt đầu: " + safe(firstPoint.recordedAt) +
             " | Kết thúc: " + safe(lastPoint.recordedAt);
+    }
+
+    function createRoutePointIcon(type, text) {
+        return L.divIcon({
+            className: "route-point-icon",
+            html: `
+                <div class="route-point-marker ${type}">
+                    ${text}
+                </div>
+            `,
+            iconSize: [34, 34],
+            iconAnchor: [17, 17],
+            popupAnchor: [0, -18]
+        });
     }
 
     function buildPointPopup(point, isFirst, isLast) {

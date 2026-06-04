@@ -16,6 +16,10 @@ public interface TripRepository extends JpaRepository<Trip, Long> {
     @EntityGraph(attributePaths = {"driver", "vehicle", "pickupLocation", "deliveryLocation"})
     List<Trip> findAllByOrderByIdAsc();
 
+    @Override
+    @EntityGraph(attributePaths = {"driver", "vehicle", "pickupLocation", "deliveryLocation"})
+    Optional<Trip> findById(Long id);
+
     boolean existsByTripCodeIgnoreCase(String tripCode);
 
     boolean existsByTripCodeIgnoreCaseAndIdNot(String tripCode, Long id);
