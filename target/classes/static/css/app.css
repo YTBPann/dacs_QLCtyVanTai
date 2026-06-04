@@ -703,3 +703,104 @@ textarea:focus {
     font-size: 13px;
     margin-top: 3px;
 }
+/* =========================
+   GPS vehicle map marker
+   ========================= */
+
+.vehicle-leaflet-icon {
+    background: transparent;
+    border: none;
+}
+
+.vehicle-map-marker {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 3px solid #6b7280;
+    box-shadow: 0 4px 10px rgba(15, 23, 42, 0.28);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    line-height: 1;
+}
+
+.vehicle-map-marker.status-active {
+    border-color: #16a34a;
+}
+
+.vehicle-map-marker.status-inactive {
+    border-color: #dc2626;
+}
+
+.vehicle-map-marker.status-in-progress {
+    border-color: #f59e0b;
+}
+
+.vehicle-map-marker.status-planned {
+    border-color: #2563eb;
+}
+
+.vehicle-map-marker.status-completed {
+    border-color: #6b7280;
+}
+
+.vehicle-map-marker.status-unknown {
+    border-color: #9ca3af;
+}
+
+.vehicle-map-marker span {
+    transform: translateY(1px);
+}
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.page-header h1 {
+    margin: 0 0 6px;
+}
+
+.page-header p {
+    margin: 0;
+    color: #64748b;
+}
+
+.page-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 36px;
+    border-radius: 8px;
+    padding: 8px 14px;
+    border: 1px solid transparent;
+    text-decoration: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: Arial, sans-serif;
+    line-height: 1.2;
+}
+
+.btn-primary {
+    background: #2563eb;
+    color: white;
+    border-color: #2563eb;
+}
+
+.btn-primary:hover {
+    background: #1d4ed8;
+    border-color: #1d4ed8;
+}

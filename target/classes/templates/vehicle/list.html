@@ -21,8 +21,9 @@
             </div>
 
             <div class="page-actions">
-                <a class="btn btn-secondary" th:href="@{/dashboard}">Về dashboard</a>
-                <a class="btn btn-primary" th:href="@{/admin/vehicles/create}">Tạo xe mới</a>
+                <a class="btn btn-primary" th:href="@{/admin/vehicles/create}">
+                    + Tạo xe
+                </a>
             </div>
         </div>
 
@@ -67,7 +68,9 @@
 
                         <td th:text="${vehicle.vehicleType}">Xe tải</td>
 
-                        <td class="text-center" th:text="${vehicle.capacity != null ? vehicle.capacity : '-'}">2.50</td>
+                        <td class="text-center" th:text="${vehicle.capacity != null ? vehicle.capacity : '-'}">
+                            2.50
+                        </td>
 
                         <td class="text-center">
                             <span th:if="${vehicle.active}" class="badge badge-success">Hoạt động</span>
