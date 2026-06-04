@@ -99,6 +99,22 @@ public class TripController {
         }
     }
 
+    @GetMapping("/{id}/route")
+    public String showRoutePage(
+            @PathVariable Long id,
+            Model model,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            Trip trip = tripService.findById(id);
+            model.addAttribute("trip", trip);
+            return "trip/route";
+        } catch (IllegalArgumentException ex) {
+            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+            return "redirect:/admin/trips";
+        }
+    }
+
     @PostMapping("/{id}/status")
     public String updateStatus(
             @PathVariable Long id,

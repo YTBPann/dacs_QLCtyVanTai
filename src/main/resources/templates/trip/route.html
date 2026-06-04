@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Lộ trình chuyến</title>
+
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+    <script defer th:src="@{/js/app.js}"></script>
+
+    <style>
+        .route-main {
+            min-height: calc(100vh - 68px);
+            padding: 28px 20px 40px;
+            background: #f4f7fb;
+        }
+
+        .route-container {
+            width: min(1400px, 100%);
+            margin: 0 auto;
+        }
+
+        .route-info-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .route-info-item {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 10px 12px;
+        }
+
+        .route-info-label {
+            color: #64748b;
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+
+        .route-info-value {
+            color: #0f172a;
+            font-weight: 700;
+            line-height: 1.35;
+            word-break: break-word;
+        }
+
+        .route-map-card {
+            background: #ffffff;
+            border-radius: 14px;
+            padding: 18px;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+        }
+
+        #routeMap {
+            width: 100%;
+            height: calc(100vh - 330px);
+            min-height: 560px;
+            border-radius: 12px;
+            border: 1px solid #cbd5e1;
+        }
+
+        .route-status {
+            margin: 12px 0 0;
+            color: #475569;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .route-popup-title {
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .route-popup-row {
+            margin: 3px 0;
+        }
+
+        @media (max-width: 900px) {
+            .route-info-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 760px) {
+            .route-main {
+                padding: 20px 12px 32px;
+            }
+
+            .route-info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            #routeMap {
+                height: calc(100vh - 360px);
+                min-height: 420px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div th:replace="~{fragments/app-header :: appHeader}"></div>
+
+<main class="route-main">
+    <div class="route-container">
+
+        <div class="page-header">
+            <div>
+                <h1>Lộ trình chuyến</h1>
+                <p>
+                    Xem lại lịch sử tọa độ GPS mà tài xế đã gửi trong quá trình vận chuyển.
+                </p>
+            </div>
+
+            <div class="page-actions">
+                <a class="btn btn-secondary" th:href="@{/admin/trips}">
+                    Về danh sách
+                </a>
+            </div>
+        </div>
+
+        <section class="route-map-card">
+            <div class="route-info-grid">
+                <div class="route-info-item">
+                    <div class="route-info-label">Mã chuyến</div>
+                    <div class="route-info-value" th:text="${trip.tripCode}">
+                        001-101-20260512-001
+                    </div>
+                </div>
+
+                <div class="route-info-item">
+                    <div class="route-info-label">Tài xế</div>
+                    <div class="route-info-value"
+                         th:text="${trip.driver.fullName != null && !#strings.isEmpty(trip.driver.fullName) ? trip.driver.fullName : trip.driver.username}">
+                        Tài xế
+                    </div>
+                </div>
+
+                <div class="route-info-item">
+                    <div class="route-info-label">Xe</div>
+                    <div class="route-info-value" th:text="${trip.vehicle.licensePlate}">
+                        51C-123.59
+                    </div>
+                </div>
+
+                <div class="route-info-item">
+                    <div class="route-info-label">Trạng thái</div>
+                    <div class="route-info-value" th:text="${trip.status.displayName}">
+                        Đang vận chuyển
+                    </div>
+                </div>
+            </div>
+
+            <div id="routeMap"></div>
+
+            <p class="route-status" id="routeStatus">
+                Đang tải lịch sử GPS của chuyến...
+            </p>
+        </section>
+
+    </div>
+</main>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script th:inline="javascript">
+    const gpsRouteUrl = /*[[@{/api/admin/trips/{id}/gps-route(id=${trip.id})}]]*/ "/api/admin/trips/0/gps-route";
+
+    const routeMap = L.map("routeMap").setView([10.762622, 106.660172], 12);
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: "&copy; OpenStreetMap contributors"
+    }).addTo(routeMap);
+
+    const routeLayer = L.layerGroup().addTo(routeMap);
+
+    loadGpsRoute();
+
+    function loadGpsRoute() {
+        const status = document.getElementById("routeStatus");
+        status.innerText = "Đang tải lịch sử GPS của chuyến...";
+
+        fetch(gpsRouteUrl)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Không tải được dữ liệu lộ trình. Mã lỗi: " + response.status);
+                }
+
+                return response.json();
+            })
+            .then(data => {
+                renderGpsRoute(data);
+            })
+            .catch(error => {
+                status.innerText = "Lỗi: " + error.message;
+            });
+    }
+
+    function renderGpsRoute(data) {
+        routeLayer.clearLayers();
+
+        const status = document.getElementById("routeStatus");
+
+        if (!Array.isArray(data) || data.length === 0) {
+            status.innerText = "Chuyến này chưa có dữ liệu GPS để vẽ lộ trình.";
+            return;
+        }
+
+        const validPoints = data.filter(point =>
+            point.latitude !== null &&
+            point.longitude !== null
+        );
+
+        if (validPoints.length === 0) {
+            status.innerText = "Dữ liệu GPS của chuyến không có tọa độ hợp lệ.";
+            return;
+        }
+
+        const latLngs = validPoints.map(point => [point.latitude, point.longitude]);
+
+        const polyline = L.polyline(latLngs, {
+            color: "#2563eb",
+            weight: 5,
+            opacity: 0.85
+        });
+
+        routeLayer.addLayer(polyline);
+
+        validPoints.forEach((point, index) => {
+            const isFirst = index === 0;
+            const isLast = index === validPoints.length - 1;
+
+            if (isFirst || isLast) {
+                const marker = L.marker([point.latitude, point.longitude])
+                    .bindPopup(buildPointPopup(point, isFirst, isLast));
+                routeLayer.addLayer(marker);
+                return;
+            }
+
+            const smallPoint = L.circleMarker([point.latitude, point.longitude], {
+                radius: 4,
+                color: "#2563eb",
+                weight: 1,
+                fillOpacity: 0.65
+            }).bindPopup(buildPointPopup(point, false, false));
+
+            routeLayer.addLayer(smallPoint);
+        });
+
+        routeMap.fitBounds(polyline.getBounds(), {
+            padding: [40, 40],
+            maxZoom: 17
+        });
+
+        const firstPoint = validPoints[0];
+        const lastPoint = validPoints[validPoints.length - 1];
+
+        status.innerText =
+            "Đã tải " + validPoints.length +
+            " điểm GPS. Bắt đầu: " + safe(firstPoint.recordedAt) +
+            " | Kết thúc: " + safe(lastPoint.recordedAt);
+    }
+
+    function buildPointPopup(point, isFirst, isLast) {
+        let title = "Điểm GPS";
+
+        if (isFirst) {
+            title = "Điểm bắt đầu";
+        }
+
+        if (isLast) {
+            title = "Điểm cuối";
+        }
+
+        const speedText = point.speedMeterPerSecond != null
+            ? point.speedMeterPerSecond + " m/s"
+            : "-";
+
+        const accuracyText = point.accuracyMeter != null
+            ? point.accuracyMeter + " mét"
+            : "-";
+
+        const headingText = point.headingDegree != null
+            ? point.headingDegree + "°"
+            : "-";
+
+        return `
+            <div>
+                <div class="route-popup-title">${title}</div>
+
+                <div class="route-popup-row">
+                    <strong>Thời gian:</strong> ${safe(point.recordedAt)}
+                </div>
+
+                <div class="route-popup-row">
+                    <strong>Vĩ độ:</strong> ${safe(point.latitude)}
+                </div>
+
+                <div class="route-popup-row">
+                    <strong>Kinh độ:</strong> ${safe(point.longitude)}
+                </div>
+
+                <div class="route-popup-row">
+                    <strong>Độ chính xác:</strong> ${safe(accuracyText)}
+                </div>
+
+                <div class="route-popup-row">
+                    <strong>Tốc độ:</strong> ${safe(speedText)}
+                </div>
+
+                <div class="route-popup-row">
+                    <strong>Hướng:</strong> ${safe(headingText)}
+                </div>
+
+                <div class="route-popup-row">
+                    <strong>Nguồn:</strong> ${safe(point.source)}
+                </div>
+            </div>
+        `;
+    }
+
+    function safe(value) {
+        if (value === null || value === undefined || value === "") {
+            return "-";
+        }
+
+        return String(value)
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#039;");
+    }
+</script>
+</body>
+</html>

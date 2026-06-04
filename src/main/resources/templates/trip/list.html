@@ -44,7 +44,7 @@
                         <th class="col-trip-time">Thời gian</th>
                         <th class="col-trip-notes">Ghi chú</th>
                         <th class="col-trip-status">Trạng thái</th>
-                        <th class="col-trip-actions">Sửa</th>
+                        <th class="col-trip-actions">Thao tác</th>
                     </tr>
                     </thead>
 
@@ -154,6 +154,11 @@
 
                         <td>
                             <div class="table-actions">
+                                <a class="btn btn-secondary btn-sm"
+                                   th:href="@{/admin/trips/{id}/route(id=${trip.id})}">
+                                    Lộ trình
+                                </a>
+
                                 <a class="btn btn-warning btn-sm"
                                    th:href="@{/admin/trips/{id}/edit(id=${trip.id})}">
                                     Sửa

@@ -1361,3 +1361,7 @@ textarea:focus {
         padding: 20px;
     }
 }
+
+.col-trip-actions {
+    width: 140px;
+}
