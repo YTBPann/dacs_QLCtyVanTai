@@ -3,451 +3,171 @@
 <head>
     <meta charset="UTF-8">
     <title>Quản lý chuyến</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f4f7fb;
-            margin: 0;
-            padding: 0;
-        }
 
-        .header {
-            background: #1e293b;
-            color: white;
-            padding: 16px 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .header a {
-            color: #e5e7eb;
-            text-decoration: none;
-            margin-left: 16px;
-        }
-
-        .container {
-            max-width: 1650px;
-            margin: 28px auto;
-            padding: 0 30px;
-        }
-
-        .page-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 18px;
-        }
-
-        .page-top h2 {
-            margin: 0;
-            color: #0f172a;
-            font-size: 24px;
-        }
-
-        .btn {
-            display: inline-block;
-            padding: 8px 12px;
-            border-radius: 6px;
-            border: none;
-            text-decoration: none;
-            cursor: pointer;
-            font-size: 14px;
-            white-space: nowrap;
-        }
-
-        .btn-primary {
-            background: #2563eb;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #1d4ed8;
-        }
-
-        .btn-secondary {
-            background: #64748b;
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background: #475569;
-        }
-
-        .btn-small {
-            padding: 7px 12px;
-            font-size: 13px;
-        }
-
-        .alert {
-            padding: 12px 14px;
-            border-radius: 6px;
-            margin-bottom: 14px;
-        }
-
-        .alert-success {
-            background: #dcfce7;
-            color: #166534;
-            border: 1px solid #86efac;
-        }
-
-        .alert-error {
-            background: #fee2e2;
-            color: #991b1b;
-            border: 1px solid #fca5a5;
-        }
-
-        .table-wrap {
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.08);
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            min-width: 1500px;
-            border-collapse: collapse;
-            table-layout: fixed;
-        }
-
-        th, td {
-            border-bottom: 1px solid #e5e7eb;
-            padding: 12px 12px;
-            vertical-align: middle;
-            color: #1e293b;
-            font-size: 14px;
-        }
-
-        th {
-            background: #f8fafc;
-            color: #334155;
-            text-align: center;
-            font-weight: 700;
-        }
-
-        tr:last-child td {
-            border-bottom: none;
-        }
-
-        .col-stt {
-            width: 55px;
-            text-align: center;
-        }
-
-        .col-code {
-            width: 170px;
-        }
-
-        .col-driver {
-            width: 170px;
-        }
-
-        .col-vehicle {
-            width: 140px;
-        }
-
-        .col-location {
-            width: 190px;
-        }
-
-        .col-time {
-            width: 210px;
-        }
-
-        .col-notes {
-            width: 170px;
-        }
-
-        .col-status {
-            width: 250px;
-            text-align: center;
-        }
-
-        .col-actions {
-            width: 90px;
-            text-align: center;
-        }
-
-        .cell-main {
-            font-weight: 700;
-            color: #0f172a;
-            line-height: 1.35;
-            word-break: break-word;
-        }
-
-        .cell-sub {
-            color: #64748b;
-            font-size: 13px;
-            margin-top: 3px;
-            line-height: 1.35;
-            word-break: break-word;
-        }
-
-        .driver-box {
-            text-align: left;
-            line-height: 1.35;
-        }
-
-        .driver-name {
-            font-weight: 700;
-            color: #0f172a;
-            font-size: 14px;
-        }
-
-        .driver-separator {
-            color: #334155;
-            font-size: 14px;
-            line-height: 1.2;
-        }
-
-        .driver-code {
-            color: #0f172a;
-            font-size: 14px;
-        }
-
-        .location-box {
-            line-height: 1.4;
-            word-break: break-word;
-        }
-
-        .location-code {
-            font-weight: 700;
-            color: #0f172a;
-            margin-bottom: 3px;
-        }
-
-        .location-name {
-            color: #334155;
-        }
-
-        .location-fallback {
-            color: #475569;
-            line-height: 1.4;
-        }
-
-        .time-line {
-            margin-bottom: 4px;
-            line-height: 1.4;
-        }
-
-        .time-label {
-            color: #64748b;
-            font-weight: 700;
-        }
-
-        .notes-text {
-            line-height: 1.4;
-            white-space: normal;
-            word-break: break-word;
-        }
-
-        .status-form {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            min-width: 230px;
-        }
-
-        .status-form select {
-            width: 150px;
-            height: 36px;
-            padding: 0 8px;
-            border-radius: 6px;
-            border: 1px solid #cbd5e1;
-            font-size: 13px;
-            background: white;
-        }
-
-        .status-form button,
-        .col-actions .btn {
-            height: 36px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .empty {
-            text-align: center;
-            color: #64748b;
-            padding: 24px;
-        }
-
-        @media (max-width: 1250px) {
-            .container {
-                max-width: 100%;
-                padding: 0 12px;
-            }
-
-            th, td {
-                padding: 9px 7px;
-                font-size: 13px;
-            }
-
-            .driver-name,
-            .driver-separator,
-            .driver-code {
-                font-size: 13px;
-            }
-
-            .cell-sub {
-                font-size: 12px;
-            }
-
-            .btn-small {
-                padding: 6px 8px;
-                font-size: 12px;
-            }
-
-            .status-form {
-                min-width: 210px;
-                gap: 8px;
-            }
-
-            .status-form select {
-                width: 140px;
-            }
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <script defer th:src="@{/js/app.js}"></script>
 </head>
 <body>
-<div class="header">
-    <div>
-        <strong>Quản lý vận tải</strong>
+
+<div th:replace="~{fragments/app-header :: appHeader}"></div>
+
+<main class="app-main">
+    <div class="app-container app-container-wide">
+
+        <div class="page-header">
+            <div>
+                <h1>Quản lý chuyến vận chuyển</h1>
+                <p>Theo dõi chuyến, tài xế, xe, điểm lấy/giao hàng và trạng thái vận chuyển.</p>
+            </div>
+
+            <div class="page-actions">
+                <a class="btn btn-primary" th:href="@{/admin/trips/create}">
+                    + Tạo chuyến
+                </a>
+            </div>
+        </div>
+
+        <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+        <div th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></div>
+
+        <section class="card">
+            <div class="table-wrapper">
+                <table class="app-table trip-table">
+                    <thead>
+                    <tr>
+                        <th class="col-trip-stt">STT</th>
+                        <th class="col-trip-code">Mã chuyến</th>
+                        <th class="col-trip-driver">Tài xế</th>
+                        <th class="col-trip-vehicle">Xe</th>
+                        <th class="col-trip-location">Điểm lấy hàng</th>
+                        <th class="col-trip-location">Điểm giao hàng</th>
+                        <th class="col-trip-time">Thời gian</th>
+                        <th class="col-trip-notes">Ghi chú</th>
+                        <th class="col-trip-status">Trạng thái</th>
+                        <th class="col-trip-actions">Sửa</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    <tr th:if="${#lists.isEmpty(trips)}">
+                        <td colspan="10" class="empty-cell">Chưa có chuyến nào.</td>
+                    </tr>
+
+                    <tr th:each="trip, iter : ${trips}">
+                        <td class="text-center" th:text="${iter.count}">1</td>
+
+                        <td>
+                            <div class="cell-main" th:text="${trip.tripCode}">
+                                001-101-20260512-001
+                            </div>
+                        </td>
+
+                        <td>
+                            <div class="driver-box">
+                                <div class="driver-name"
+                                     th:text="${trip.driver.fullName != null && !#strings.isEmpty(trip.driver.fullName) ? trip.driver.fullName : trip.driver.username}">
+                                    Tài xế số 1
+                                </div>
+                                <div class="driver-separator">-</div>
+                                <div class="driver-code" th:text="${trip.driver.username}">
+                                    driver1
+                                </div>
+                            </div>
+                        </td>
+
+                        <td>
+                            <div class="cell-main" th:text="${trip.vehicle.licensePlate}">51C-123.59</div>
+                            <div class="cell-sub" th:text="${trip.vehicle.vehicleType}">Xe tải</div>
+                        </td>
+
+                        <td>
+                            <div class="location-box" th:if="${trip.pickupLocation != null}">
+                                <div class="location-code" th:text="${trip.pickupLocation.code}">001</div>
+                                <div class="location-name" th:text="${trip.pickupLocation.name}">Kho TP.HCM</div>
+                            </div>
+
+                            <div class="location-fallback"
+                                 th:if="${trip.pickupLocation == null}"
+                                 th:text="${trip.departurePoint != null && !#strings.isEmpty(trip.departurePoint) ? trip.departurePoint : 'Chưa gán'}">
+                                Chưa gán
+                            </div>
+                        </td>
+
+                        <td>
+                            <div class="location-box" th:if="${trip.deliveryLocation != null}">
+                                <div class="location-code" th:text="${trip.deliveryLocation.code}">101</div>
+                                <div class="location-name" th:text="${trip.deliveryLocation.name}">Kho Cần Thơ</div>
+                            </div>
+
+                            <div class="location-fallback"
+                                 th:if="${trip.deliveryLocation == null}"
+                                 th:text="${trip.destinationPoint != null && !#strings.isEmpty(trip.destinationPoint) ? trip.destinationPoint : 'Chưa gán'}">
+                                Chưa gán
+                            </div>
+                        </td>
+
+                        <td>
+                            <div class="time-line">
+                                <span class="time-label">Bắt đầu:</span>
+                                <span th:text="${#temporals.format(trip.plannedStartTime, 'dd-MM-yyyy HH:mm')}">
+                                    12-05-2026 08:30
+                                </span>
+                            </div>
+
+                            <div class="time-line">
+                                <span class="time-label">Kết thúc:</span>
+                                <span th:text="${#temporals.format(trip.plannedEndTime, 'dd-MM-yyyy HH:mm')}">
+                                    12-05-2026 17:30
+                                </span>
+                            </div>
+                        </td>
+
+                        <td>
+                            <div class="note-cell"
+                                 th:text="${trip.notes != null && !#strings.isEmpty(trip.notes) ? trip.notes : '-'}">
+                                -
+                            </div>
+                        </td>
+
+                        <td>
+                            <form class="status-form"
+                                  th:action="@{/admin/trips/{id}/status(id=${trip.id})}"
+                                  method="post">
+                                <input type="hidden"
+                                       th:if="${_csrf != null}"
+                                       th:name="${_csrf.parameterName}"
+                                       th:value="${_csrf.token}">
+
+                                <select name="status">
+                                    <option th:each="status : ${statuses}"
+                                            th:value="${status}"
+                                            th:text="${status.displayName}"
+                                            th:selected="${status == trip.status}">
+                                    </option>
+                                </select>
+
+                                <button type="submit" class="btn btn-secondary btn-sm">
+                                    Lưu
+                                </button>
+                            </form>
+                        </td>
+
+                        <td>
+                            <div class="table-actions">
+                                <a class="btn btn-warning btn-sm"
+                                   th:href="@{/admin/trips/{id}/edit(id=${trip.id})}">
+                                    Sửa
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
     </div>
-    <div>
-        <a th:href="@{/dashboard}">Dashboard</a>
-        <a th:href="@{/logout}">Đăng xuất</a>
-    </div>
-</div>
+</main>
 
-<div class="container">
-    <div class="page-top">
-        <h2>Quản lý chuyến vận chuyển</h2>
-        <a class="btn btn-primary" th:href="@{/admin/trips/create}">+ Tạo chuyến</a>
-    </div>
-
-    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
-    <div th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></div>
-
-    <div class="table-wrap">
-        <table>
-            <thead>
-            <tr>
-                <th class="col-stt">STT</th>
-                <th class="col-code">Mã chuyến</th>
-                <th class="col-driver">Tài xế</th>
-                <th class="col-vehicle">Xe</th>
-                <th class="col-location">Điểm lấy hàng</th>
-                <th class="col-location">Điểm giao hàng</th>
-                <th class="col-time">Thời gian</th>
-                <th class="col-notes">Ghi chú</th>
-                <th class="col-status">Trạng thái</th>
-                <th class="col-actions">Sửa</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:if="${#lists.isEmpty(trips)}">
-                <td colspan="10" class="empty">Chưa có chuyến nào.</td>
-            </tr>
-
-            <tr th:each="trip, iter : ${trips}">
-                <td class="col-stt" th:text="${iter.count}">1</td>
-
-                <td class="col-code">
-                    <div class="cell-main" th:text="${trip.tripCode}">001-101-20260512-001</div>
-                </td>
-
-                <td class="col-driver">
-                    <div class="driver-box">
-                        <div class="driver-name"
-                             th:text="${trip.driver.fullName != null && !#strings.isEmpty(trip.driver.fullName) ? trip.driver.fullName : trip.driver.username}">
-                            Tài xế số 1
-                        </div>
-                        <div class="driver-separator">-</div>
-                        <div class="driver-code" th:text="${trip.driver.username}">
-                            driver1
-                        </div>
-                    </div>
-                </td>
-
-                <td class="col-vehicle">
-                    <div class="cell-main" th:text="${trip.vehicle.licensePlate}">51C-123.59</div>
-                    <div class="cell-sub" th:text="${trip.vehicle.vehicleType}">Xe tải</div>
-                </td>
-
-                <td class="col-location">
-                    <div class="location-box" th:if="${trip.pickupLocation != null}">
-                        <div class="location-code" th:text="${trip.pickupLocation.code}">001</div>
-                        <div class="location-name" th:text="${trip.pickupLocation.name}">Kho TP.HCM</div>
-                    </div>
-                    <div class="location-fallback"
-                         th:if="${trip.pickupLocation == null}"
-                         th:text="${trip.departurePoint != null && !#strings.isEmpty(trip.departurePoint) ? trip.departurePoint : 'Chưa gán'}">
-                        Chưa gán
-                    </div>
-                </td>
-
-                <td class="col-location">
-                    <div class="location-box" th:if="${trip.deliveryLocation != null}">
-                        <div class="location-code" th:text="${trip.deliveryLocation.code}">101</div>
-                        <div class="location-name" th:text="${trip.deliveryLocation.name}">Kho Cần Thơ</div>
-                    </div>
-                    <div class="location-fallback"
-                         th:if="${trip.deliveryLocation == null}"
-                         th:text="${trip.destinationPoint != null && !#strings.isEmpty(trip.destinationPoint) ? trip.destinationPoint : 'Chưa gán'}">
-                        Chưa gán
-                    </div>
-                </td>
-
-                <td class="col-time">
-                    <div class="time-line">
-                        <span class="time-label">Bắt đầu:</span>
-                        <span th:text="${#temporals.format(trip.plannedStartTime, 'dd-MM-yyyy HH:mm')}">
-                            12-05-2026 08:30
-                        </span>
-                    </div>
-                    <div class="time-line">
-                        <span class="time-label">Kết thúc:</span>
-                        <span th:text="${#temporals.format(trip.plannedEndTime, 'dd-MM-yyyy HH:mm')}">
-                            12-05-2026 17:30
-                        </span>
-                    </div>
-                </td>
-
-                <td class="col-notes">
-                    <div class="notes-text"
-                         th:text="${trip.notes != null && !#strings.isEmpty(trip.notes) ? trip.notes : '-'}">
-                        -
-                    </div>
-                </td>
-
-                <td class="col-status">
-                    <form class="status-form"
-                          th:action="@{/admin/trips/{id}/status(id=${trip.id})}"
-                          method="post">
-                        <select name="status">
-                            <option th:each="status : ${statuses}"
-                                    th:value="${status}"
-                                    th:text="${status.displayName}"
-                                    th:selected="${status == trip.status}">
-                            </option>
-                        </select>
-                        <button type="submit" class="btn btn-secondary btn-small">Lưu</button>
-                    </form>
-                </td>
-
-                <td class="col-actions">
-                    <a class="btn btn-primary btn-small"
-                       th:href="@{/admin/trips/{id}/edit(id=${trip.id})}">
-                        Sửa
-                    </a>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
 </body>
 </html>

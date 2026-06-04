@@ -7,77 +7,106 @@
     <meta name="_csrf" th:content="${_csrf.token}">
     <meta name="_csrf_header" th:content="${_csrf.headerName}">
 
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <script defer th:src="@{/js/app.js}"></script>
+
     <style>
-        body {
-            font-family: Arial, sans-serif;
+        .driver-gps-main {
+            min-height: calc(100vh - 72px);
+            padding: 28px 20px 40px;
             background: #f4f7fb;
-            margin: 0;
-            padding: 0;
         }
 
-        .header {
-            background: #1e293b;
-            color: white;
-            padding: 16px 24px;
+        .driver-gps-container {
+            width: min(900px, 100%);
+            margin: 0 auto;
+        }
+
+        .driver-gps-header {
             display: flex;
             justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        .driver-gps-title h1 {
+            margin: 0 0 6px;
+            color: #0f172a;
+            font-size: 28px;
+            line-height: 1.25;
+        }
+
+        .driver-gps-title p {
+            margin: 0;
+            color: #64748b;
+            line-height: 1.5;
+            max-width: 700px;
+        }
+
+        .driver-gps-actions-top {
+            display: flex;
+            justify-content: flex-end;
             align-items: center;
+            flex-shrink: 0;
         }
 
-        .header a {
-            color: white;
-            text-decoration: none;
-            margin-right: 14px;
-        }
-
-        .container {
-            max-width: 900px;
-            margin: 32px auto;
-            padding: 0 16px;
-        }
-
-        .card {
-            background: white;
+        .driver-gps-card {
+            background: #ffffff;
             padding: 24px;
-            border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+            border-radius: 14px;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
         }
 
-        .btn {
+        .driver-gps-note {
+            color: #64748b;
+            line-height: 1.65;
+            margin: 0 0 18px;
+        }
+
+        .driver-gps-button-row {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .gps-btn {
             border: none;
             padding: 10px 14px;
             border-radius: 8px;
             cursor: pointer;
             color: white;
-            margin-right: 8px;
-            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            font-family: Arial, sans-serif;
         }
 
-        .btn-start {
+        .gps-btn-start {
             background: #2563eb;
         }
 
-        .btn-stop {
+        .gps-btn-start:hover {
+            background: #1d4ed8;
+        }
+
+        .gps-btn-stop {
             background: #ef4444;
         }
 
-        .btn-secondary {
-            display: inline-block;
-            background: #475569;
-            color: white;
-            text-decoration: none;
-            padding: 10px 14px;
-            border-radius: 8px;
-            margin-bottom: 16px;
+        .gps-btn-stop:hover {
+            background: #dc2626;
         }
 
         .status-box {
             margin-top: 16px;
             padding: 12px 14px;
-            border-radius: 8px;
+            border-radius: 10px;
             background: #f8fafc;
             border: 1px solid #cbd5e1;
             line-height: 1.7;
+            color: #334155;
         }
 
         .status-ok {
@@ -95,78 +124,125 @@
         .info-grid {
             display: grid;
             grid-template-columns: 180px 1fr;
-            gap: 8px 12px;
-            margin-top: 16px;
+            gap: 10px 14px;
+            margin-top: 18px;
+            padding-top: 18px;
+            border-top: 1px solid #e5e7eb;
         }
 
-        .label {
-            font-weight: bold;
+        .info-label {
+            font-weight: 700;
             color: #334155;
         }
 
-        .value {
+        .info-value {
             color: #111827;
             word-break: break-word;
         }
 
-        .note {
-            color: #64748b;
-            line-height: 1.6;
+        @media (max-width: 760px) {
+            .driver-gps-main {
+                padding: 20px 12px 32px;
+            }
+
+            .driver-gps-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .driver-gps-actions-top {
+                justify-content: flex-start;
+            }
+
+            .driver-gps-actions-top .btn {
+                width: 100%;
+            }
+
+            .driver-gps-button-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .gps-btn {
+                width: 100%;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+                gap: 4px 0;
+            }
+
+            .info-value {
+                margin-bottom: 8px;
+            }
         }
     </style>
 </head>
 <body>
-<div class="header">
-    <div>
-        <a th:href="@{/dashboard}">← Dashboard</a>
-        <b>Theo dõi GPS tài xế</b>
-    </div>
-</div>
 
-<div class="container">
-    <div class="card">
-        <a class="btn-secondary" th:href="@{/dashboard}">Quay lại Dashboard</a>
+<div th:replace="~{fragments/app-header :: appHeader}"></div>
 
-        <h2>Cập nhật vị trí GPS</h2>
+<main class="driver-gps-main">
+    <div class="driver-gps-container">
 
-        <p class="note">
-            Trang này dùng định vị của trình duyệt để gửi vị trí hiện tại về hệ thống.
-            Khi có chuyến đang ở trạng thái <b>Đang vận chuyển</b>, vị trí sẽ được gắn với chuyến và xe tương ứng.
-        </p>
+        <div class="driver-gps-header">
+            <div class="driver-gps-title">
+                <h1>Theo dõi GPS tài xế</h1>
+                <p>
+                    Trang này dùng định vị của trình duyệt để gửi vị trí hiện tại về hệ thống.
+                    Khi có chuyến đang ở trạng thái <b>Đang vận chuyển</b>, vị trí sẽ được gắn với chuyến và xe tương ứng.
+                </p>
+            </div>
 
-        <button class="btn btn-start" type="button" onclick="startTracking()">
-            Bật cập nhật GPS
-        </button>
-
-        <button class="btn btn-stop" type="button" onclick="stopTracking()">
-            Tắt cập nhật GPS
-        </button>
-
-        <div id="statusBox" class="status-box">
-            Trạng thái: Chưa bật GPS.
+            <div class="driver-gps-actions-top">
+                <a class="btn btn-secondary" th:href="@{/dashboard}">
+                    Về dashboard
+                </a>
+            </div>
         </div>
 
-        <div class="info-grid">
-            <div class="label">Vĩ độ:</div>
-            <div class="value" id="latitude">-</div>
+        <section class="driver-gps-card">
+            <div class="driver-gps-button-row">
+                <button class="gps-btn gps-btn-start" type="button" onclick="startTracking()">
+                    Bật cập nhật GPS
+                </button>
 
-            <div class="label">Kinh độ:</div>
-            <div class="value" id="longitude">-</div>
+                <button class="gps-btn gps-btn-stop" type="button" onclick="stopTracking()">
+                    Tắt cập nhật GPS
+                </button>
+            </div>
 
-            <div class="label">Độ chính xác:</div>
-            <div class="value" id="accuracy">-</div>
+            <p class="driver-gps-note">
+                Sau khi bật GPS, trình duyệt sẽ xin quyền truy cập vị trí. Hệ thống gửi vị trí mỗi 10 giây khi lấy được tọa độ hợp lệ.
+            </p>
 
-            <div class="label">Lần gửi gần nhất:</div>
-            <div class="value" id="lastSentAt">-</div>
+            <div id="statusBox" class="status-box">
+                Trạng thái: Chưa bật GPS.
+            </div>
 
-            <div class="label">Chuyến đang gắn:</div>
-            <div class="value" id="tripInfo">-</div>
+            <div class="info-grid">
+                <div class="info-label">Vĩ độ:</div>
+                <div class="info-value" id="latitude">-</div>
 
-            <div class="label">Xe đang gắn:</div>
-            <div class="value" id="vehicleInfo">-</div>
-        </div>
+                <div class="info-label">Kinh độ:</div>
+                <div class="info-value" id="longitude">-</div>
+
+                <div class="info-label">Độ chính xác:</div>
+                <div class="info-value" id="accuracy">-</div>
+
+                <div class="info-label">Lần gửi gần nhất:</div>
+                <div class="info-value" id="lastSentAt">-</div>
+
+                <div class="info-label">Chuyến đang gắn:</div>
+                <div class="info-value" id="tripInfo">-</div>
+
+                <div class="info-label">Xe đang gắn:</div>
+                <div class="info-value" id="vehicleInfo">-</div>
+            </div>
+        </section>
+
     </div>
-</div>
+</main>
 
 <script th:inline="javascript">
     const gpsUpdateUrl = /*[[@{/driver/gps/location}]]*/ "/driver/gps/location";

@@ -3,91 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <title th:text="${formTitle}">Form chuyến</title>
+
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <script defer th:src="@{/js/app.js}"></script>
+
     <style>
-        body {
-            font-family: Arial, sans-serif;
+        .form-page-main {
+            min-height: calc(100vh - 72px);
+            padding: 28px 20px 40px;
             background: #f4f7fb;
-            margin: 0;
-            padding: 0;
         }
 
-        .header {
-            background: #1e293b;
-            color: white;
-            padding: 16px 24px;
+        .trip-form-container {
+            width: min(980px, 100%);
+            margin: 0 auto;
+        }
+
+        .form-page-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 18px;
         }
 
-        .header a {
-            color: #e5e7eb;
-            text-decoration: none;
-            margin-left: 16px;
-        }
-
-        .container {
-            max-width: 900px;
-            margin: 28px auto;
-            padding: 0 20px;
-        }
-
-        .card {
-            background: white;
-            border-radius: 10px;
-            padding: 22px;
-            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.08);
-        }
-
-        h2 {
-            margin-top: 0;
+        .form-page-title h1 {
+            margin: 0 0 6px;
             color: #0f172a;
+            font-size: 28px;
+            line-height: 1.25;
         }
 
-        .form-grid {
+        .form-page-title p {
+            margin: 0;
+            color: #64748b;
+            line-height: 1.5;
+            max-width: 760px;
+        }
+
+        .form-page-actions {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .trip-form-card {
+            background: #ffffff;
+            border-radius: 14px;
+            padding: 24px;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+        }
+
+        .trip-form-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 16px;
         }
 
-        .form-group {
-            margin-bottom: 16px;
+        .trip-form-grid .form-group {
+            margin-bottom: 0;
         }
 
-        .form-group.full {
+        .trip-form-grid .form-group.full {
             grid-column: 1 / -1;
         }
 
-        label {
+        .trip-form-grid label {
             display: block;
             font-weight: 700;
             color: #334155;
             margin-bottom: 6px;
         }
 
-        input, select, textarea {
+        .trip-form-grid input,
+        .trip-form-grid select,
+        .trip-form-grid textarea {
             width: 100%;
             box-sizing: border-box;
             padding: 9px 10px;
             border: 1px solid #cbd5e1;
-            border-radius: 6px;
+            border-radius: 8px;
             font-size: 14px;
+            font-family: Arial, sans-serif;
+            background: white;
+            outline: none;
         }
 
-        input[readonly] {
+        .trip-form-grid input:focus,
+        .trip-form-grid select:focus,
+        .trip-form-grid textarea:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+        }
+
+        .trip-form-grid input[readonly] {
             background: #f8fafc;
             color: #475569;
         }
 
-        textarea {
+        .trip-form-grid textarea {
             resize: vertical;
             min-height: 100px;
         }
 
-        .error {
+        .field-error {
             color: #dc2626;
             font-size: 13px;
             margin-top: 5px;
+            font-weight: 600;
         }
 
         .global-error {
@@ -95,17 +119,19 @@
             color: #991b1b;
             border: 1px solid #fca5a5;
             padding: 12px 14px;
-            border-radius: 6px;
+            border-radius: 8px;
             margin-bottom: 16px;
+            font-weight: 600;
         }
 
-        .warning {
+        .warning-box {
             background: #fef3c7;
             color: #92400e;
             border: 1px solid #fcd34d;
             padding: 12px 14px;
-            border-radius: 6px;
+            border-radius: 8px;
             margin-bottom: 16px;
+            line-height: 1.5;
         }
 
         .info-box {
@@ -113,211 +139,253 @@
             color: #1e40af;
             border: 1px solid #bfdbfe;
             padding: 12px 14px;
-            border-radius: 6px;
+            border-radius: 8px;
             margin-bottom: 16px;
             line-height: 1.5;
         }
 
-        .actions {
+        .field-hint {
+            display: block;
+            color: #64748b;
+            margin-top: 5px;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .trip-form-actions {
             display: flex;
             gap: 10px;
             margin-top: 18px;
         }
 
-        .btn {
-            display: inline-block;
-            padding: 9px 14px;
-            border-radius: 6px;
-            border: none;
-            text-decoration: none;
-            cursor: pointer;
-            font-size: 14px;
-        }
+        @media (max-width: 760px) {
+            .form-page-main {
+                padding: 20px 12px 32px;
+            }
 
-        .btn-primary {
-            background: #2563eb;
-            color: white;
-        }
+            .form-page-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
 
-        .btn-primary:hover {
-            background: #1d4ed8;
-        }
+            .form-page-actions {
+                justify-content: flex-start;
+            }
 
-        .btn-secondary {
-            background: #64748b;
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background: #475569;
-        }
-
-        small {
-            color: #64748b;
-        }
-
-        @media (max-width: 720px) {
-            .form-grid {
+            .trip-form-grid {
                 grid-template-columns: 1fr;
             }
 
-            .header {
+            .trip-form-actions {
                 flex-direction: column;
-                gap: 10px;
-                align-items: flex-start;
+                align-items: stretch;
+            }
+
+            .trip-form-actions .btn,
+            .form-page-actions .btn {
+                width: 100%;
             }
         }
     </style>
 </head>
 <body>
-<div class="header">
-    <div>
-        <strong>Quản lý vận tải</strong>
-    </div>
-    <div>
-        <a class="action-link"
-           th:if="${role != null and role.toString() == 'ADMIN'}"
-           th:href="@{/admin/trips}">
-            Quản lý chuyến
-        </a>
-        <a th:href="@{/dashboard}">Dashboard</a>
-        <a th:href="@{/logout}">Đăng xuất</a>
-    </div>
-</div>
 
-<div class="container">
-    <div class="card">
-        <h2 th:text="${formTitle}">Tạo chuyến mới</h2>
+<div th:replace="~{fragments/app-header :: appHeader}"></div>
 
-        <div th:if="${mode == 'create'}" class="info-box">
-            Mã chuyến sẽ được tự sinh sau khi lưu theo dạng:
-            <strong>mã điểm lấy - mã điểm giao - ngày - số thứ tự</strong>.
-            <br>
-            Ví dụ: <strong>001-101-20260512-001</strong>
-        </div>
+<main class="form-page-main">
+    <div class="trip-form-container">
 
-        <div th:if="${#lists.isEmpty(drivers)}" class="warning">
-            Hiện không có tài xế khả dụng. Tài xế phải là DRIVER và đang được bật đăng nhập.
-        </div>
-
-        <div th:if="${#lists.isEmpty(vehicles)}" class="warning">
-            Hiện không có xe khả dụng. Xe phải đang được bật hoạt động.
-        </div>
-
-        <div th:if="${#lists.isEmpty(pickupLocations)}" class="warning">
-            Hiện không có điểm lấy hàng khả dụng. Địa điểm phải đang bật và có loại PICKUP_POINT hoặc BOTH.
-        </div>
-
-        <div th:if="${#lists.isEmpty(deliveryLocations)}" class="warning">
-            Hiện không có điểm giao hàng khả dụng. Địa điểm phải đang bật và có loại DELIVERY_POINT hoặc BOTH.
-        </div>
-
-        <form th:object="${tripForm}"
-              th:action="@{${formAction}}"
-              method="post">
-
-            <div th:if="${#fields.hasGlobalErrors()}" class="global-error">
-                <div th:each="err : ${#fields.globalErrors()}" th:text="${err}">Lỗi</div>
+        <div class="form-page-header">
+            <div class="form-page-title">
+                <h1 th:text="${formTitle}">Tạo chuyến mới</h1>
+                <p>
+                    Nhập thông tin chuyến vận chuyển, tài xế, xe, điểm lấy/giao hàng và thời gian dự kiến.
+                </p>
             </div>
 
-            <div class="form-grid">
-                <div class="form-group" th:if="${mode == 'edit'}">
-                    <label for="tripCode">Mã chuyến</label>
-                    <input id="tripCode" type="text" th:field="*{tripCode}" readonly>
-                    <small>
-                        Mã chuyến sẽ tự đổi nếu thay điểm lấy, điểm giao hoặc ngày bắt đầu.
-                    </small>
-                    <div class="error" th:if="${#fields.hasErrors('tripCode')}" th:errors="*{tripCode}"></div>
-                </div>
+            <div class="form-page-actions">
+                <a class="btn btn-secondary" th:href="@{/admin/trips}">
+                    Về danh sách
+                </a>
+            </div>
+        </div>
 
-                <div class="form-group" th:classappend="${mode == 'create'} ? 'full' : ''">
-                    <label for="status">Trạng thái</label>
-                    <select id="status" th:field="*{status}">
-                        <option th:each="status : ${statuses}"
-                                th:value="${status}"
-                                th:text="${status.displayName}">
-                        </option>
-                    </select>
-                    <div class="error" th:if="${#fields.hasErrors('status')}" th:errors="*{status}"></div>
-                </div>
+        <section class="trip-form-card">
 
-                <div class="form-group">
-                    <label for="driverId">Tài xế</label>
-                    <select id="driverId" th:field="*{driverId}">
-                        <option value="">-- Chọn tài xế --</option>
-                        <option th:each="driver : ${drivers}"
-                                th:value="${driver.id}"
-                                th:text="${(driver.fullName != null && !#strings.isEmpty(driver.fullName) ? driver.fullName : driver.username) + ' - ' + driver.username}">
-                        </option>
-                    </select>
-                    <div class="error" th:if="${#fields.hasErrors('driverId')}" th:errors="*{driverId}"></div>
-                </div>
-
-                <div class="form-group">
-                    <label for="vehicleId">Xe</label>
-                    <select id="vehicleId" th:field="*{vehicleId}">
-                        <option value="">-- Chọn xe --</option>
-                        <option th:each="vehicle : ${vehicles}"
-                                th:value="${vehicle.id}"
-                                th:text="${vehicle.licensePlate + ' - ' + vehicle.vehicleType}">
-                        </option>
-                    </select>
-                    <div class="error" th:if="${#fields.hasErrors('vehicleId')}" th:errors="*{vehicleId}"></div>
-                </div>
-
-                <div class="form-group">
-                    <label for="pickupLocationId">Điểm lấy hàng</label>
-                    <select id="pickupLocationId" th:field="*{pickupLocationId}">
-                        <option value="">-- Chọn điểm lấy hàng --</option>
-                        <option th:each="location : ${pickupLocations}"
-                                th:value="${location.id}"
-                                th:text="${location.code + ' - ' + location.name}">
-                        </option>
-                    </select>
-                    <div class="error" th:if="${#fields.hasErrors('pickupLocationId')}" th:errors="*{pickupLocationId}"></div>
-                </div>
-
-                <div class="form-group">
-                    <label for="deliveryLocationId">Điểm giao hàng</label>
-                    <select id="deliveryLocationId" th:field="*{deliveryLocationId}">
-                        <option value="">-- Chọn điểm giao hàng --</option>
-                        <option th:each="location : ${deliveryLocations}"
-                                th:value="${location.id}"
-                                th:text="${location.code + ' - ' + location.name}">
-                        </option>
-                    </select>
-                    <div class="error" th:if="${#fields.hasErrors('deliveryLocationId')}" th:errors="*{deliveryLocationId}"></div>
-                </div>
-
-                <div class="form-group">
-                    <label for="plannedStartTime">Thời gian dự kiến bắt đầu</label>
-                    <input id="plannedStartTime" type="datetime-local" th:field="*{plannedStartTime}">
-                    <div class="error" th:if="${#fields.hasErrors('plannedStartTime')}" th:errors="*{plannedStartTime}"></div>
-                </div>
-
-                <div class="form-group">
-                    <label for="plannedEndTime">Thời gian dự kiến kết thúc</label>
-                    <input id="plannedEndTime" type="datetime-local" th:field="*{plannedEndTime}">
-                    <div class="error" th:if="${#fields.hasErrors('plannedEndTime')}" th:errors="*{plannedEndTime}"></div>
-                </div>
-
-                <div class="form-group full">
-                    <label for="notes">Ghi chú</label>
-                    <textarea id="notes" th:field="*{notes}" placeholder="Nhập ghi chú nếu có"></textarea>
-                    <div class="error" th:if="${#fields.hasErrors('notes')}" th:errors="*{notes}"></div>
-                    <small>Tối đa 2000 ký tự.</small>
-                </div>
+            <div th:if="${mode == 'create'}" class="info-box">
+                Mã chuyến sẽ được tự sinh sau khi lưu theo dạng:
+                <strong>mã điểm lấy - mã điểm giao - ngày - số thứ tự</strong>.
+                <br>
+                Ví dụ: <strong>001-101-20260512-001</strong>
             </div>
 
-            <div class="actions">
-                <button type="submit" class="btn btn-primary"
-                        th:disabled="${#lists.isEmpty(drivers) or #lists.isEmpty(vehicles) or #lists.isEmpty(pickupLocations) or #lists.isEmpty(deliveryLocations)}">
-                    Lưu
-                </button>
-                <a class="btn btn-secondary" th:href="@{/admin/trips}">Quay lại</a>
+            <div th:if="${#lists.isEmpty(drivers)}" class="warning-box">
+                Hiện không có tài xế khả dụng. Tài xế phải là DRIVER và đang được bật đăng nhập.
             </div>
-        </form>
+
+            <div th:if="${#lists.isEmpty(vehicles)}" class="warning-box">
+                Hiện không có xe khả dụng. Xe phải đang được bật hoạt động.
+            </div>
+
+            <div th:if="${#lists.isEmpty(pickupLocations)}" class="warning-box">
+                Hiện không có điểm lấy hàng khả dụng. Địa điểm phải đang bật và có loại PICKUP_POINT hoặc BOTH.
+            </div>
+
+            <div th:if="${#lists.isEmpty(deliveryLocations)}" class="warning-box">
+                Hiện không có điểm giao hàng khả dụng. Địa điểm phải đang bật và có loại DELIVERY_POINT hoặc BOTH.
+            </div>
+
+            <form th:object="${tripForm}"
+                  th:action="@{${formAction}}"
+                  method="post">
+
+                <input type="hidden"
+                       th:if="${_csrf != null}"
+                       th:name="${_csrf.parameterName}"
+                       th:value="${_csrf.token}">
+
+                <div th:if="${#fields.hasGlobalErrors()}" class="global-error">
+                    <div th:each="err : ${#fields.globalErrors()}" th:text="${err}">Lỗi</div>
+                </div>
+
+                <div class="trip-form-grid">
+                    <div class="form-group" th:if="${mode == 'edit'}">
+                        <label for="tripCode">Mã chuyến</label>
+                        <input id="tripCode" type="text" th:field="*{tripCode}" readonly>
+                        <small class="field-hint">
+                            Mã chuyến sẽ tự đổi nếu thay điểm lấy, điểm giao hoặc ngày bắt đầu.
+                        </small>
+                        <div class="field-error"
+                             th:if="${#fields.hasErrors('tripCode')}"
+                             th:errors="*{tripCode}">
+                        </div>
+                    </div>
+
+                    <div class="form-group" th:classappend="${mode == 'create'} ? 'full' : ''">
+                        <label for="status">Trạng thái</label>
+                        <select id="status" th:field="*{status}">
+                            <option th:each="status : ${statuses}"
+                                    th:value="${status}"
+                                    th:text="${status.displayName}">
+                            </option>
+                        </select>
+                        <div class="field-error"
+                             th:if="${#fields.hasErrors('status')}"
+                             th:errors="*{status}">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="driverId">Tài xế</label>
+                        <select id="driverId" th:field="*{driverId}">
+                            <option value="">-- Chọn tài xế --</option>
+                            <option th:each="driver : ${drivers}"
+                                    th:value="${driver.id}"
+                                    th:text="${(driver.fullName != null && !#strings.isEmpty(driver.fullName) ? driver.fullName : driver.username) + ' - ' + driver.username}">
+                            </option>
+                        </select>
+                        <div class="field-error"
+                             th:if="${#fields.hasErrors('driverId')}"
+                             th:errors="*{driverId}">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="vehicleId">Xe</label>
+                        <select id="vehicleId" th:field="*{vehicleId}">
+                            <option value="">-- Chọn xe --</option>
+                            <option th:each="vehicle : ${vehicles}"
+                                    th:value="${vehicle.id}"
+                                    th:text="${vehicle.licensePlate + ' - ' + vehicle.vehicleType}">
+                            </option>
+                        </select>
+                        <div class="field-error"
+                             th:if="${#fields.hasErrors('vehicleId')}"
+                             th:errors="*{vehicleId}">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pickupLocationId">Điểm lấy hàng</label>
+                        <select id="pickupLocationId" th:field="*{pickupLocationId}">
+                            <option value="">-- Chọn điểm lấy hàng --</option>
+                            <option th:each="location : ${pickupLocations}"
+                                    th:value="${location.id}"
+                                    th:text="${location.code + ' - ' + location.name}">
+                            </option>
+                        </select>
+                        <div class="field-error"
+                             th:if="${#fields.hasErrors('pickupLocationId')}"
+                             th:errors="*{pickupLocationId}">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="deliveryLocationId">Điểm giao hàng</label>
+                        <select id="deliveryLocationId" th:field="*{deliveryLocationId}">
+                            <option value="">-- Chọn điểm giao hàng --</option>
+                            <option th:each="location : ${deliveryLocations}"
+                                    th:value="${location.id}"
+                                    th:text="${location.code + ' - ' + location.name}">
+                            </option>
+                        </select>
+                        <div class="field-error"
+                             th:if="${#fields.hasErrors('deliveryLocationId')}"
+                             th:errors="*{deliveryLocationId}">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="plannedStartTime">Thời gian dự kiến bắt đầu</label>
+                        <input id="plannedStartTime"
+                               type="datetime-local"
+                               th:field="*{plannedStartTime}">
+                        <div class="field-error"
+                             th:if="${#fields.hasErrors('plannedStartTime')}"
+                             th:errors="*{plannedStartTime}">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="plannedEndTime">Thời gian dự kiến kết thúc</label>
+                        <input id="plannedEndTime"
+                               type="datetime-local"
+                               th:field="*{plannedEndTime}">
+                        <div class="field-error"
+                             th:if="${#fields.hasErrors('plannedEndTime')}"
+                             th:errors="*{plannedEndTime}">
+                        </div>
+                    </div>
+
+                    <div class="form-group full">
+                        <label for="notes">Ghi chú</label>
+                        <textarea id="notes"
+                                  th:field="*{notes}"
+                                  placeholder="Nhập ghi chú nếu có"></textarea>
+                        <div class="field-error"
+                             th:if="${#fields.hasErrors('notes')}"
+                             th:errors="*{notes}">
+                        </div>
+                        <small class="field-hint">Tối đa 2000 ký tự.</small>
+                    </div>
+                </div>
+
+                <div class="trip-form-actions">
+                    <button type="submit"
+                            class="btn btn-primary"
+                            th:disabled="${#lists.isEmpty(drivers) or #lists.isEmpty(vehicles) or #lists.isEmpty(pickupLocations) or #lists.isEmpty(deliveryLocations)}">
+                        Lưu
+                    </button>
+
+                    <a class="btn btn-secondary" th:href="@{/admin/trips}">
+                        Quay lại
+                    </a>
+                </div>
+            </form>
+        </section>
+
     </div>
-</div>
+</main>
+
 </body>
 </html>

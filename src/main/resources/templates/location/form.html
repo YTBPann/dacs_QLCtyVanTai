@@ -4,97 +4,102 @@
     <meta charset="UTF-8">
     <title th:text="${pageTitle}">Tạo địa điểm</title>
 
+    <link rel="stylesheet" th:href="@{/css/app.css}">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
+    <script defer th:src="@{/js/app.js}"></script>
+
     <style>
-        body {
-            font-family: Arial, sans-serif;
+        .form-page-main {
+            min-height: calc(100vh - 72px);
+            padding: 28px 20px 40px;
             background: #f4f7fb;
-            margin: 0;
-            padding: 0;
-            color: #111827;
         }
 
-        .header {
-            background: #1e293b;
-            color: white;
-            padding: 16px 24px;
+        .location-form-container {
+            width: min(920px, 100%);
+            margin: 0 auto;
+        }
+
+        .form-page-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 18px;
         }
 
-        .header h1 {
+        .form-page-title h1 {
+            margin: 0 0 6px;
+            color: #0f172a;
+            font-size: 28px;
+            line-height: 1.25;
+        }
+
+        .form-page-title p {
             margin: 0;
-            font-size: 22px;
+            color: #64748b;
+            line-height: 1.5;
+            max-width: 680px;
         }
 
-        .header a {
-            color: white;
-            text-decoration: none;
-            font-weight: 600;
+        .form-page-actions {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            flex-shrink: 0;
         }
 
-        .container {
-            max-width: 780px;
-            margin: 28px auto;
-            padding: 0 16px;
+        .location-form-card {
+            background: #ffffff;
+            border-radius: 14px;
+            padding: 24px;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
         }
 
-        .card {
-            background: white;
-            border-radius: 10px;
-            padding: 22px;
-            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
-        }
-
-        h2 {
-            margin: 0 0 18px;
-            font-size: 22px;
-        }
-
-        .form-grid {
+        .location-form-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 14px 16px;
         }
 
-        .form-group {
+        .location-form-grid .form-group {
             margin-bottom: 0;
         }
 
-        .form-group.full {
+        .location-form-grid .form-group.full {
             grid-column: 1 / -1;
         }
 
-        label {
+        .location-form-grid label {
             display: block;
             font-weight: 700;
             margin-bottom: 6px;
             color: #334155;
         }
 
-        input,
-        select,
-        textarea {
+        .location-form-grid input,
+        .location-form-grid select,
+        .location-form-grid textarea {
             width: 100%;
             box-sizing: border-box;
             border: 1px solid #cbd5e1;
-            border-radius: 6px;
+            border-radius: 8px;
             padding: 9px 10px;
             font-size: 14px;
             outline: none;
             background: white;
+            font-family: Arial, sans-serif;
         }
 
-        textarea {
-            min-height: 90px;
+        .location-form-grid textarea {
+            min-height: 96px;
             resize: vertical;
         }
 
-        input:focus,
-        select:focus,
-        textarea:focus {
+        .location-form-grid input:focus,
+        .location-form-grid select:focus,
+        .location-form-grid textarea:focus {
             border-color: #2563eb;
             box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
         }
@@ -103,9 +108,10 @@
             margin-top: 5px;
             font-size: 12px;
             color: #64748b;
+            line-height: 1.4;
         }
 
-        .error {
+        .field-error {
             margin-top: 5px;
             font-size: 13px;
             color: #dc2626;
@@ -119,20 +125,20 @@
             gap: 12px;
             background: #f8fafc;
             border: 1px solid #e2e8f0;
-            border-radius: 8px;
+            border-radius: 10px;
             padding: 12px;
         }
 
         .map-tools-text {
             color: #475569;
             font-size: 13px;
-            line-height: 1.4;
+            line-height: 1.45;
         }
 
         .map-panel {
             display: none;
             border: 1px solid #cbd5e1;
-            border-radius: 10px;
+            border-radius: 12px;
             overflow: hidden;
         }
 
@@ -151,161 +157,241 @@
             color: #475569;
             font-size: 13px;
             border-top: 1px solid #e2e8f0;
+            line-height: 1.45;
         }
 
-        .actions {
+        .location-form-actions {
             display: flex;
             align-items: center;
             gap: 10px;
             margin-top: 18px;
         }
 
-        .btn {
-            display: inline-block;
-            border: none;
-            border-radius: 6px;
-            padding: 9px 14px;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-            white-space: nowrap;
-        }
-
-        .btn-primary {
-            background: #2563eb;
-            color: white;
-        }
-
-        .btn-secondary {
-            background: #e2e8f0;
-            color: #0f172a;
-        }
-
         .btn-map {
             background: #0f766e;
             color: white;
+            border-color: #0f766e;
+        }
+
+        .btn-map:hover {
+            background: #0d665f;
+            border-color: #0d665f;
+        }
+
+        @media (max-width: 760px) {
+            .form-page-main {
+                padding: 20px 12px 32px;
+            }
+
+            .form-page-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .form-page-actions {
+                justify-content: flex-start;
+            }
+
+            .location-form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .map-tools {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .location-form-actions {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .location-form-actions .btn,
+            .form-page-actions .btn {
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
-<div class="header">
-    <h1>Quản lý vận tải</h1>
-    <a th:href="@{/admin/locations}">Về danh sách địa điểm</a>
-</div>
 
-<div class="container">
-    <div class="card">
-        <h2 th:text="${pageTitle}">Tạo địa điểm</h2>
+<div th:replace="~{fragments/app-header :: appHeader}"></div>
 
-        <form th:object="${locationForm}"
-              th:action="${isEdit} ? @{/admin/locations/{id}/edit(id=${locationId})} : @{/admin/locations/create}"
-              method="post">
+<main class="form-page-main">
+    <div class="location-form-container">
 
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="code">Mã địa điểm</label>
-                    <input id="code" type="text" th:field="*{code}" placeholder="VD: 001, 101, KHO_A">
-                    <div class="hint">Dùng cho mã chuyến sau này, ví dụ: 001-101-20260512-001.</div>
-                    <div class="error" th:if="${#fields.hasErrors('code')}" th:errors="*{code}"></div>
-                </div>
-
-                <div class="form-group">
-                    <label for="type">Loại địa điểm</label>
-                    <select id="type" th:field="*{type}">
-                        <option value="">-- Chọn loại địa điểm --</option>
-                        <option th:each="locationType : ${locationTypes}"
-                                th:value="${locationType}"
-                                th:text="${locationType.displayName}">
-                            Lấy/Giao hàng
-                        </option>
-                    </select>
-                    <div class="error" th:if="${#fields.hasErrors('type')}" th:errors="*{type}"></div>
-                </div>
-
-                <div class="form-group full">
-                    <label for="name">Tên địa điểm</label>
-                    <input id="name" type="text" th:field="*{name}" placeholder="VD: Cảng Thạnh Phước">
-                    <div class="error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
-                </div>
-
-                <div class="form-group full">
-                    <label for="address">Địa chỉ</label>
-                    <input id="address" type="text" th:field="*{address}" placeholder="Nhập địa chỉ đầy đủ">
-                    <div class="error" th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></div>
-                </div>
-
-                <div class="form-group full">
-                    <label for="province">Tỉnh/thành</label>
-                    <input id="province" type="text" th:field="*{province}" placeholder="VD: Bình Dương">
-                    <div class="error" th:if="${#fields.hasErrors('province')}" th:errors="*{province}"></div>
-                </div>
-
-                <div class="form-group full">
-                    <div class="map-tools">
-                        <div class="map-tools-text">
-                            Có thể nhập tọa độ thủ công, hoặc mở bản đồ rồi bấm vào vị trí cần chọn.
-                        </div>
-                        <button type="button" class="btn btn-map" id="toggleMapButton">
-                            Mở bản đồ chọn tọa độ
-                        </button>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="latitude">Latitude / Vĩ độ</label>
-                    <input id="latitude"
-                           type="number"
-                           step="0.0000001"
-                           min="-90"
-                           max="90"
-                           th:field="*{latitude}"
-                           placeholder="VD: 11.0041670">
-                    <div class="hint">Khoảng hợp lệ: -90 đến 90.</div>
-                    <div class="error" th:if="${#fields.hasErrors('latitude')}" th:errors="*{latitude}"></div>
-                </div>
-
-                <div class="form-group">
-                    <label for="longitude">Longitude / Kinh độ</label>
-                    <input id="longitude"
-                           type="number"
-                           step="0.0000001"
-                           min="-180"
-                           max="180"
-                           th:field="*{longitude}"
-                           placeholder="VD: 106.7583330">
-                    <div class="hint">Khoảng hợp lệ: -180 đến 180.</div>
-                    <div class="error" th:if="${#fields.hasErrors('longitude')}" th:errors="*{longitude}"></div>
-                </div>
-
-                <div class="form-group full">
-                    <div class="map-panel" id="mapPanel">
-                        <div id="locationMap"></div>
-                        <div class="map-note">
-                            Bấm vào bản đồ để đặt marker. Hệ thống sẽ tự điền Latitude và Longitude vào form.
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-group full">
-                    <label for="note">Ghi chú</label>
-                    <textarea id="note" th:field="*{note}" placeholder="Ghi chú thêm nếu có"></textarea>
-                    <div class="error" th:if="${#fields.hasErrors('note')}" th:errors="*{note}"></div>
-                </div>
+        <div class="form-page-header">
+            <div class="form-page-title">
+                <h1 th:text="${pageTitle}">Tạo địa điểm</h1>
+                <p>
+                    Nhập thông tin địa điểm và chọn tọa độ để dùng cho điểm lấy/giao hàng trong chuyến vận chuyển.
+                </p>
             </div>
 
-            <div class="actions">
-                <button type="submit" class="btn btn-primary">
-                    Lưu địa điểm
-                </button>
-
+            <div class="form-page-actions">
                 <a class="btn btn-secondary" th:href="@{/admin/locations}">
-                    Hủy
+                    Về danh sách
                 </a>
             </div>
-        </form>
+        </div>
+
+        <section class="location-form-card">
+            <form th:object="${locationForm}"
+                  th:action="${isEdit} ? @{/admin/locations/{id}/edit(id=${locationId})} : @{/admin/locations/create}"
+                  method="post">
+
+                <input type="hidden"
+                       th:if="${_csrf != null}"
+                       th:name="${_csrf.parameterName}"
+                       th:value="${_csrf.token}">
+
+                <div class="location-form-grid">
+                    <div class="form-group">
+                        <label for="code">Mã địa điểm</label>
+                        <input id="code"
+                               type="text"
+                               th:field="*{code}"
+                               placeholder="VD: 001, 101, KHO_A">
+                        <div class="hint">
+                            Dùng cho mã chuyến sau này, ví dụ: 001-101-20260512-001.
+                        </div>
+                        <div class="field-error"
+                             th:if="${#fields.hasErrors('code')}"
+                             th:errors="*{code}">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="type">Loại địa điểm</label>
+                        <select id="type" th:field="*{type}">
+                            <option value="">-- Chọn loại địa điểm --</option>
+                            <option th:each="locationType : ${locationTypes}"
+                                    th:value="${locationType}"
+                                    th:text="${locationType.displayName}">
+                                Lấy/Giao hàng
+                            </option>
+                        </select>
+                        <div class="field-error"
+                             th:if="${#fields.hasErrors('type')}"
+                             th:errors="*{type}">
+                        </div>
+                    </div>
+
+                    <div class="form-group full">
+                        <label for="name">Tên địa điểm</label>
+                        <input id="name"
+                               type="text"
+                               th:field="*{name}"
+                               placeholder="VD: Cảng Thạnh Phước">
+                        <div class="field-error"
+                             th:if="${#fields.hasErrors('name')}"
+                             th:errors="*{name}">
+                        </div>
+                    </div>
+
+                    <div class="form-group full">
+                        <label for="address">Địa chỉ</label>
+                        <input id="address"
+                               type="text"
+                               th:field="*{address}"
+                               placeholder="Nhập địa chỉ đầy đủ">
+                        <div class="field-error"
+                             th:if="${#fields.hasErrors('address')}"
+                             th:errors="*{address}">
+                        </div>
+                    </div>
+
+                    <div class="form-group full">
+                        <label for="province">Tỉnh/thành</label>
+                        <input id="province"
+                               type="text"
+                               th:field="*{province}"
+                               placeholder="VD: Bình Dương">
+                        <div class="field-error"
+                             th:if="${#fields.hasErrors('province')}"
+                             th:errors="*{province}">
+                        </div>
+                    </div>
+
+                    <div class="form-group full">
+                        <div class="map-tools">
+                            <div class="map-tools-text">
+                                Có thể nhập tọa độ thủ công, hoặc mở bản đồ rồi bấm vào vị trí cần chọn.
+                            </div>
+
+                            <button type="button" class="btn btn-map" id="toggleMapButton">
+                                Mở bản đồ chọn tọa độ
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="latitude">Latitude / Vĩ độ</label>
+                        <input id="latitude"
+                               type="number"
+                               step="0.0000001"
+                               min="-90"
+                               max="90"
+                               th:field="*{latitude}"
+                               placeholder="VD: 11.0041670">
+                        <div class="hint">Khoảng hợp lệ: -90 đến 90.</div>
+                        <div class="field-error"
+                             th:if="${#fields.hasErrors('latitude')}"
+                             th:errors="*{latitude}">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="longitude">Longitude / Kinh độ</label>
+                        <input id="longitude"
+                               type="number"
+                               step="0.0000001"
+                               min="-180"
+                               max="180"
+                               th:field="*{longitude}"
+                               placeholder="VD: 106.7583330">
+                        <div class="hint">Khoảng hợp lệ: -180 đến 180.</div>
+                        <div class="field-error"
+                             th:if="${#fields.hasErrors('longitude')}"
+                             th:errors="*{longitude}">
+                        </div>
+                    </div>
+
+                    <div class="form-group full">
+                        <div class="map-panel" id="mapPanel">
+                            <div id="locationMap"></div>
+                            <div class="map-note">
+                                Bấm vào bản đồ để đặt marker. Hệ thống sẽ tự điền Latitude và Longitude vào form.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group full">
+                        <label for="note">Ghi chú</label>
+                        <textarea id="note"
+                                  th:field="*{note}"
+                                  placeholder="Ghi chú thêm nếu có"></textarea>
+                        <div class="field-error"
+                             th:if="${#fields.hasErrors('note')}"
+                             th:errors="*{note}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="location-form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        Lưu địa điểm
+                    </button>
+
+                    <a class="btn btn-secondary" th:href="@{/admin/locations}">
+                        Hủy
+                    </a>
+                </div>
+            </form>
+        </section>
+
     </div>
-</div>
+</main>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>

@@ -3,327 +3,161 @@
 <head>
     <meta charset="UTF-8">
     <title>Quản lý địa điểm</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f4f7fb;
-            margin: 0;
-            padding: 0;
-            color: #111827;
-        }
 
-        .header {
-            background: #1e293b;
-            color: white;
-            padding: 16px 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .header h1 {
-            margin: 0;
-            font-size: 22px;
-        }
-
-        .header a {
-            color: white;
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .container {
-            max-width: 1380px;
-            margin: 28px auto;
-            padding: 0 20px;
-        }
-
-        .page-actions {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-
-        .page-actions h2 {
-            margin: 0;
-            font-size: 22px;
-        }
-
-        .btn {
-            display: inline-block;
-            border: none;
-            border-radius: 6px;
-            padding: 7px 10px;
-            text-decoration: none;
-            font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
-            white-space: nowrap;
-            text-align: center;
-        }
-
-        .btn-primary {
-            background: #2563eb;
-            color: white;
-        }
-
-        .btn-edit {
-            background: #0f766e;
-            color: white;
-        }
-
-        .btn-disable {
-            background: #dc2626;
-            color: white;
-        }
-
-        .btn-enable {
-            background: #16a34a;
-            color: white;
-        }
-
-        .alert {
-            border-radius: 6px;
-            padding: 10px 12px;
-            margin-bottom: 14px;
-            font-weight: 600;
-        }
-
-        .alert-success {
-            background: #dcfce7;
-            color: #166534;
-            border: 1px solid #86efac;
-        }
-
-        .table-wrapper {
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
-            overflow: hidden;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            table-layout: fixed;
-            font-size: 13px;
-        }
-
-        th,
-        td {
-            border-bottom: 1px solid #e5e7eb;
-            padding: 12px 12px;
-            vertical-align: middle;
-        }
-
-        th {
-            background: #f1f5f9;
-            color: #334155;
-            text-align: center;
-            font-weight: 700;
-        }
-
-        td {
-            color: #111827;
-        }
-
-        .text-center {
-            text-align: center;
-        }
-
-        .code-cell {
-            font-weight: 700;
-            text-align: center;
-        }
-
-        .name-cell {
-            font-weight: 600;
-            line-height: 1.4;
-            word-break: break-word;
-        }
-
-        .address-cell,
-        .note-cell {
-            line-height: 1.4;
-            word-break: break-word;
-            white-space: normal;
-        }
-
-        .coordinates {
-            font-family: Consolas, monospace;
-            font-size: 12px;
-            line-height: 1.45;
-            text-align: left;
-            display: inline-block;
-        }
-
-        .badge {
-            display: inline-block;
-            border-radius: 999px;
-            padding: 4px 8px;
-            font-size: 12px;
-            font-weight: 700;
-        }
-
-        .badge-active {
-            background: #dcfce7;
-            color: #166534;
-        }
-
-        .badge-inactive {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-        .action-group {
-            display: flex;
-            flex-direction: column;
-            align-items: stretch;
-            gap: 6px;
-        }
-
-        .action-group form {
-            margin: 0;
-        }
-
-        .action-group button,
-        .action-group a {
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        .empty-row {
-            text-align: center;
-            padding: 22px;
-            color: #64748b;
-            font-weight: 600;
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <script defer th:src="@{/js/app.js}"></script>
 </head>
 <body>
-<div class="header">
-    <h1>Quản lý vận tải</h1>
-    <a th:href="@{/dashboard}">Về Dashboard</a>
-</div>
 
-<div class="container">
-    <div class="page-actions">
-        <h2>Danh sách địa điểm</h2>
-        <a class="btn btn-primary" th:href="@{/admin/locations/create}">+ Tạo địa điểm</a>
+<div th:replace="~{fragments/app-header :: appHeader}"></div>
+
+<main class="app-main">
+    <div class="app-container app-container-wide">
+
+        <div class="page-header">
+            <div>
+                <h1>Danh sách địa điểm</h1>
+                <p>Quản lý điểm lấy hàng, điểm giao hàng và tọa độ dùng cho chuyến vận chuyển.</p>
+            </div>
+
+            <div class="page-actions">
+                <a class="btn btn-primary" th:href="@{/admin/locations/create}">
+                    + Tạo địa điểm
+                </a>
+            </div>
+        </div>
+
+        <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+
+        <section class="card">
+            <div class="table-wrapper">
+                <table class="app-table location-table">
+                    <colgroup>
+                        <col class="col-location-stt">
+                        <col class="col-location-code">
+                        <col class="col-location-name">
+                        <col class="col-location-type">
+                        <col class="col-location-province">
+                        <col class="col-location-address">
+                        <col class="col-location-coordinates">
+                        <col class="col-location-status">
+                        <col class="col-location-note">
+                        <col class="col-location-actions">
+                    </colgroup>
+
+                    <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>Mã</th>
+                        <th>Tên địa điểm</th>
+                        <th>Loại</th>
+                        <th>Tỉnh/thành</th>
+                        <th>Địa chỉ</th>
+                        <th>Tọa độ</th>
+                        <th>Trạng thái</th>
+                        <th>Ghi chú</th>
+                        <th>Thao tác</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    <tr th:if="${#lists.isEmpty(locations)}">
+                        <td colspan="10" class="empty-cell">Chưa có địa điểm nào.</td>
+                    </tr>
+
+                    <tr th:each="location, iterStat : ${locations}">
+                        <td class="text-center" th:text="${iterStat.count}">1</td>
+
+                        <td class="text-center">
+                            <strong th:text="${location.code}">001</strong>
+                        </td>
+
+                        <td>
+                            <div class="cell-main"
+                                 th:text="${location.name}"
+                                 th:title="${location.name}">
+                                Cảng Thạnh Phước
+                            </div>
+                        </td>
+
+                        <td class="text-center"
+                            th:text="${location.type != null ? location.type.displayName : '-'}">
+                            Điểm lấy hàng
+                        </td>
+
+                        <td class="text-center"
+                            th:text="${location.province}"
+                            th:title="${location.province}">
+                            Bình Dương
+                        </td>
+
+                        <td>
+                            <div class="note-cell"
+                                 th:text="${location.address}"
+                                 th:title="${location.address}">
+                                Số 207, đường DT 747A, Thạnh Phước, Tân Uyên
+                            </div>
+                        </td>
+
+                        <td class="text-center">
+                            <div class="coordinates">
+                                <div>
+                                    <strong>Lat:</strong>
+                                    <span th:text="${location.latitude}">11.0041670</span>
+                                </div>
+                                <div>
+                                    <strong>Lng:</strong>
+                                    <span th:text="${location.longitude}">106.7583330</span>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td class="text-center">
+                            <span th:if="${location.active}" class="badge badge-success">Đang bật</span>
+                            <span th:unless="${location.active}" class="badge badge-danger">Đã tắt</span>
+                        </td>
+
+                        <td>
+                            <div class="note-cell"
+                                 th:text="${location.note != null ? location.note : '-'}"
+                                 th:title="${location.note != null ? location.note : '-'}">
+                                -
+                            </div>
+                        </td>
+
+                        <td>
+                            <div class="table-actions">
+                                <a class="btn btn-warning btn-sm"
+                                   th:href="@{/admin/locations/{id}/edit(id=${location.id})}">
+                                    Sửa
+                                </a>
+
+                                <form class="inline-form"
+                                      th:action="@{/admin/locations/{id}/toggle(id=${location.id})}"
+                                      method="post">
+                                    <input type="hidden"
+                                           th:if="${_csrf != null}"
+                                           th:name="${_csrf.parameterName}"
+                                           th:value="${_csrf.token}">
+
+                                    <button th:if="${location.active}" class="btn btn-danger btn-sm" type="submit">
+                                        Tắt
+                                    </button>
+
+                                    <button th:unless="${location.active}" class="btn btn-success btn-sm" type="submit">
+                                        Bật
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
     </div>
+</main>
 
-    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
-
-    <div class="table-wrapper">
-        <table>
-            <colgroup>
-                <col style="width: 4%;">
-                <col style="width: 6%;">
-                <col style="width: 13%;">
-                <col style="width: 10%;">
-                <col style="width: 9%;">
-                <col style="width: 22%;">
-                <col style="width: 12%;">
-                <col style="width: 8%;">
-                <col style="width: 10%;">
-                <col style="width: 6%;">
-            </colgroup>
-
-            <thead>
-            <tr>
-                <th>STT</th>
-                <th>Mã</th>
-                <th>Tên địa điểm</th>
-                <th>Loại</th>
-                <th>Tỉnh/thành</th>
-                <th>Địa chỉ</th>
-                <th>Tọa độ</th>
-                <th>Trạng thái</th>
-                <th>Ghi chú</th>
-                <th>Thao tác</th>
-            </tr>
-            </thead>
-
-            <tbody>
-            <tr th:if="${#lists.isEmpty(locations)}">
-                <td colspan="10" class="empty-row">Chưa có địa điểm nào.</td>
-            </tr>
-
-            <tr th:each="location, iterStat : ${locations}">
-                <td class="text-center" th:text="${iterStat.count}">1</td>
-
-                <td class="code-cell" th:text="${location.code}">001</td>
-
-                <td class="name-cell"
-                    th:text="${location.name}"
-                    th:title="${location.name}">
-                    Cảng Thạnh Phước
-                </td>
-
-                <td class="text-center"
-                    th:text="${location.type != null ? location.type.displayName : '-'}">
-                    Điểm lấy hàng
-                </td>
-
-                <td class="text-center"
-                    th:text="${location.province}"
-                    th:title="${location.province}">
-                    Bình Dương
-                </td>
-
-                <td class="address-cell"
-                    th:text="${location.address}"
-                    th:title="${location.address}">
-                    Số 207, đường DT 747A, Thạnh Phước, Tân Uyên
-                </td>
-
-                <td class="text-center">
-                    <div class="coordinates">
-                        <div>
-                            Lat:
-                            <span th:text="${location.latitude}">11.0041670</span>
-                        </div>
-                        <div>
-                            Lng:
-                            <span th:text="${location.longitude}">106.7583330</span>
-                        </div>
-                    </div>
-                </td>
-
-                <td class="text-center">
-                    <span th:if="${location.active}" class="badge badge-active">Đang bật</span>
-                    <span th:unless="${location.active}" class="badge badge-inactive">Đã tắt</span>
-                </td>
-
-                <td class="note-cell"
-                    th:text="${location.note != null ? location.note : '-'}"
-                    th:title="${location.note != null ? location.note : '-'}">
-                    -
-                </td>
-
-                <td>
-                    <div class="action-group">
-                        <a class="btn btn-edit"
-                           th:href="@{/admin/locations/{id}/edit(id=${location.id})}">
-                            Sửa
-                        </a>
-
-                        <form th:action="@{/admin/locations/{id}/toggle(id=${location.id})}" method="post">
-                            <button type="submit"
-                                    class="btn"
-                                    th:classappend="${location.active} ? ' btn-disable' : ' btn-enable'"
-                                    th:text="${location.active} ? 'Tắt' : 'Bật'">
-                                Tắt
-                            </button>
-                        </form>
-                    </div>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
 </body>
 </html>
